@@ -3,7 +3,7 @@ title: Which tracker columns become registry fields, which become wiki prose, an
 labels: [wayfinder:grilling]
 parent: 1
 blocked_by: []
-assignee:
+assignee: chazm
 status: open
 ---
 
