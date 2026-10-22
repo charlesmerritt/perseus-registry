@@ -22,6 +22,7 @@ A demonstrable prototype of the Perseus research registry: a **static wiki** gen
 
 - Destination is a working prototype, not just a spec; YAML in Git; local markdown tracker; D2S STAC is read-only; FDIS Core is referenced only by version string (decided while charting).
 - [What does the D2S STAC catalog actually contain and expose?](0002-d2s-stac-catalog-survey.md): public, CORS-open, fast enough to fetch at build time; IDs are UUIDs or slugs; TreeMap, biomass, and LiDAR exist; metadata is thin; keep a cached snapshot.
+- [Which existing metadata standards should the registry borrow its vocabulary from?](0003-relationship-vocabulary-prior-art.md): schema.org types + DataCite 4.6 relations (7 borrowed, inverses generated); Project dependsOn/uses, Integration Level, Tasks, and unregistered targets are Perseus-specific.
 - Canonical terms: **Research Project** (not "project"/"workstream"), **Software** with `kind: model | tool | library` (see `CONTEXT.md`).
 
 ## Not yet specified
