@@ -3,7 +3,7 @@ title: What are the fields, identifiers, and controlled vocabularies for each re
 labels: [wayfinder:grilling]
 parent: 1
 blocked_by: [2, 4, 5]
-assignee:
+assignee: chazm
 status: open
 ---
 
