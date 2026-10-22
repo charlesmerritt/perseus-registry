@@ -23,13 +23,14 @@ A demonstrable prototype of the Perseus research registry: a **static wiki** gen
 - Destination is a working prototype, not just a spec; YAML in Git; local markdown tracker; D2S STAC is read-only; FDIS Core is referenced only by version string (decided while charting).
 - [What does the D2S STAC catalog actually contain and expose?](0002-d2s-stac-catalog-survey.md): public, CORS-open, fast enough to fetch at build time; IDs are UUIDs or slugs; TreeMap, biomass, and LiDAR exist; metadata is thin; keep a cached snapshot.
 - [Which existing metadata standards should the registry borrow its vocabulary from?](0003-relationship-vocabulary-prior-art.md): schema.org types + DataCite 4.6 relations (7 borrowed, inverses generated); Project dependsOn/uses, Integration Level, Tasks, and unregistered targets are Perseus-specific.
+- [Which tracker columns become registry fields, which become wiki prose, and which stay in the meeting tracker?](0004-tracker-vs-registry-boundary.md): registry stands alone and the tracker is only a seed; durable columns become fields or prose and meeting logistics aren't imported; PI Ambassador is dropped (moves to the Objective/Task level); unconfirmed facts get an explicit marker.
 - Canonical terms: **Research Project** (not "project"/"workstream"), **Software** with `kind: model | tool | library` (see `CONTEXT.md`).
 
 ## Not yet specified
 
 - **Build-out**: the generator, seeding records from the tracker, and CI validation. Graduates once the schema and site stack are decided.
 - **Public vs internal information**: the tracker has internal notes ("Discussion needed", status confirmations). Do some fields stay off a public site, or is the whole wiki consortium-internal?
-- **Objectives 1, 3, 4**: only Obj 2 has a tracker. Do the others have equivalent lists, and should the prototype include placeholder pages for them?
+- **Objective and Task structure**: the fixed Objectives (1 Measurement, 2 Modeling, 3 Management, 4 Mindset) and their numbered Tasks come from consortium documentation not yet in the repo. They likely become higher-order records or pages with their own PI leads (where PI Ambassadors land). Only Obj 2 has a project list; do Objectives 1, 3, 4 get placeholder pages in the prototype? User will supply the documentation later.
 - **People**: are researchers records of their own (with ORCID), or names on Research Projects? Hangs on the relationship model.
 - **Versioning**: Software versions, model runs, dataset releases. How much does a prototype need?
 - **Hosting and handoff**: where the demo site lives (GitHub Pages?) and who maintains it afterward.

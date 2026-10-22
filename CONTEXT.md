@@ -15,7 +15,14 @@ _Avoid_: using "FDIS" alone to mean the registry
 One of Perseus's four top-level research areas: 1 Measurement, 2 Modeling, 3 Management, 4 Mindset.
 
 **Task**:
-A numbered subdivision of an Objective (e.g. 2.1 Landowner Optimization, 2.4 Data Visualization). A Research Project has one primary Task and may support others.
+A numbered subdivision of an Objective (e.g. 2.1 Landowner Optimization, 2.4 Data Visualization), fixed by consortium documentation. A Research Project has one primary Task and may support others. Objectives and Tasks may have their own PI leads, distinct from a Research Project's Leads.
+
+**Lead**:
+A person doing the work of a Research Project, and its first point of contact. Often a student or postdoc.
+_Avoid_: PI Ambassador (a tracker role for PIs; belongs at the Objective/Task level, not on a Research Project)
+
+**Unconfirmed**:
+A marker on a structured fact (a link, role, or Task alignment) that has been stated but not verified by the people involved. Shown visibly so the right person can confirm or correct it.
 
 **Research Project**:
 A consortium work package, research question, or effort: the unit of "what someone is working on". Belongs to one Objective via its primary Task. Has a lifecycle status independent of any dataset's publication status.
