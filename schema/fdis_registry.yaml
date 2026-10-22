@@ -1,0 +1,839 @@
+id: https://w3id.org/perseus/fdis-registry
+name: fdis_registry
+title: FDIS Registry Profile
+version: "0.1.0"
+description: >-
+  The FDIS Registry Profile v0.1: record types, links and controlled
+  vocabularies for the Perseus Research Registry. This file is the single
+  source; the JSON Schema and JSON-LD context in generated/ are derived from it
+  (see README.md).
+
+  Each Registry Record is one YAML file holding one record of one of the five
+  record classes (ResearchProject, Software, Dataset, Institution,
+  Publication). People, links, Mentions and dataset sources are inline
+  structures, not records.
+
+  Prose sections (e.g. a Research Project's Overview, Goals and milestones,
+  Needs from other Objectives, Integration notes, Methods) are NOT schema
+  fields. They live in the record's Markdown body, outside this schema.
+license: CC0-1.0
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  perseus: https://w3id.org/perseus/
+  schema: http://schema.org/
+  codemeta: https://codemeta.github.io/terms/
+  datacite: https://schema.datacite.org/meta/kernel-4.6/
+  repostatus: https://www.repostatus.org/#
+  ORCID: https://orcid.org/
+  ROR: https://ror.org/
+
+default_prefix: perseus
+default_range: string
+
+imports:
+  - linkml:types
+
+# ---------------------------------------------------------------------------
+# Types: identifier and value formats
+# ---------------------------------------------------------------------------
+types:
+  ProjectId:
+    typeof: string
+    description: >-
+      Research Project ID, O{objective}-{nn} (e.g. O2-06). Assigned once,
+      never changed, never reused.
+    pattern: "^O[1-4]-\\d{2}$"
+  Slug:
+    typeof: string
+    description: >-
+      Short lowercase slug identifying a Software, Dataset, Institution or
+      Publication record (e.g. landis-ii, treemap, uga). Never changes.
+    pattern: "^[a-z0-9]+(-[a-z0-9]+)*$"
+  TaskNumber:
+    typeof: string
+    description: A Task number, {objective}.{n} (e.g. 2.2).
+    pattern: "^[1-4]\\.\\d+$"
+  StacId:
+    typeof: string
+    description: A D2S STAC Collection or Item ID; a UUID or a slug.
+    pattern: "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+  Doi:
+    typeof: string
+    description: A bare DOI (no https://doi.org/ prefix), e.g. 10.2737/RDS-2025-0032.
+    pattern: "^10\\.\\d{4,9}/\\S+$"
+  Orcid:
+    typeof: string
+    description: A bare ORCID iD, e.g. 0000-0002-1825-0097.
+    pattern: "^\\d{4}-\\d{4}-\\d{4}-\\d{3}[\\dX]$"
+  RorId:
+    typeof: string
+    description: A ROR ID URL, e.g. https://ror.org/00te3t702.
+    pattern: "^https://ror\\.org/0[a-z0-9]{8}$"
+  Url:
+    typeof: uri
+    description: An http(s) URL.
+    pattern: "^https?://\\S+$"
+
+# ---------------------------------------------------------------------------
+# Enums: every controlled vocabulary in the profile
+# ---------------------------------------------------------------------------
+enums:
+  ProjectStatus:
+    description: Research Project lifecycle status.
+    permissible_values:
+      proposed:
+      active:
+      paused:
+      completed:
+      superseded:
+      archived:
+  ProjectPhase:
+    description: >-
+      Research Project phase. Tracker mapping: Concept / Development ->
+      concept; Development -> development; Testing / Validation -> validation;
+      Integration / Implementation -> integration; Operational / Ongoing ->
+      operational.
+    permissible_values:
+      concept:
+      development:
+      validation:
+      integration:
+      operational:
+  SoftwareKind:
+    permissible_values:
+      model:
+        description: A simulation or statistical model (exports as Software, not DataCite Model).
+      tool:
+      library:
+  DevelopmentStatus:
+    description: repostatus.org values, as used by CodeMeta developmentStatus.
+    permissible_values:
+      concept:
+        meaning: repostatus:concept
+      wip:
+        meaning: repostatus:wip
+      suspended:
+        meaning: repostatus:suspended
+      abandoned:
+        meaning: repostatus:abandoned
+      active:
+        meaning: repostatus:active
+      inactive:
+        meaning: repostatus:inactive
+      unsupported:
+        meaning: repostatus:unsupported
+      moved:
+        meaning: repostatus:moved
+  FdisAdapterStatus:
+    permissible_values:
+      none:
+      planned:
+      in_progress:
+      done:
+  DatasetAccess:
+    permissible_values:
+      public:
+      consortium:
+      restricted:
+  DatasetAvailability:
+    permissible_values:
+      planned:
+        description: Listed as a project output but does not exist yet.
+      in_progress:
+      published:
+      withdrawn:
+  PublicationType:
+    permissible_values:
+      article:
+        meaning: schema:ScholarlyArticle
+      report:
+        meaning: schema:Report
+      thesis:
+        meaning: schema:Thesis
+      presentation:
+        meaning: schema:PresentationDigitalDocument
+      release:
+        meaning: schema:SoftwareSourceCode
+      other:
+        meaning: schema:CreativeWork
+  IntegrationLevel:
+    description: >-
+      How strongly a Research Project connects to an Objective. `discuss`
+      means a connection is suspected but not confirmed.
+    permissible_values:
+      n/a:
+      informational:
+      collaborative:
+      integrated:
+      discuss:
+  ObjectiveNumber:
+    permissible_values:
+      "1":
+        description: Measurement
+      "2":
+        description: Modeling
+      "3":
+        description: Management
+      "4":
+        description: Mindset
+
+# ---------------------------------------------------------------------------
+# Slots
+# ---------------------------------------------------------------------------
+slots:
+  # --- identity and description -------------------------------------------
+  id:
+    identifier: true
+    required: true
+    range: Slug
+    description: Persistent record ID; expands under the Perseus base IRI in JSON-LD.
+  title:
+    slot_uri: schema:name
+  name:
+    slot_uri: schema:name
+  summary:
+    slot_uri: schema:description
+    description: One- or two-sentence summary. Longer prose goes in the Markdown body.
+  short_name:
+    slot_uri: schema:alternateName
+  url:
+    slot_uri: schema:url
+    range: Url
+  doi:
+    slot_uri: perseus:doi
+    range: Doi
+    exact_mappings:
+      - datacite:DOI
+
+  # --- placeholder markers -------------------------------------------------
+  unconfirmed:
+    slot_uri: perseus:unconfirmed
+    range: boolean
+    description: >-
+      True when this fact (link, person entry, Task alignment) has been stated
+      but not verified by the people involved. Absent means confirmed.
+  note:
+    slot_uri: perseus:note
+    description: Short free-text note, e.g. why something is unconfirmed or what a link carries.
+
+  # --- typed reference targets (registered ID or Mention) ----------------
+  project:
+    slot_uri: perseus:project
+    description: A Research Project ID, or a Mention of an unregistered one.
+    any_of:
+      - range: ProjectId
+      - range: Mention
+  software:
+    slot_uri: perseus:software
+    description: A Software ID, or a Mention of unregistered software.
+    any_of:
+      - range: Slug
+      - range: Mention
+  dataset:
+    slot_uri: perseus:dataset
+    description: A Dataset ID, or a Mention of an unregistered dataset.
+    any_of:
+      - range: Slug
+      - range: Mention
+  institution:
+    slot_uri: perseus:institution
+    description: An Institution ID, or a Mention of an unregistered institution.
+    any_of:
+      - range: Slug
+      - range: Mention
+  via:
+    slot_uri: perseus:via
+    description: The Software that consumes or produces the Dataset (ID or Mention).
+    close_mappings:
+      - schema:instrument
+    any_of:
+      - range: Slug
+      - range: Mention
+
+  # --- people --------------------------------------------------------------
+  orcid:
+    slot_uri: perseus:orcid
+    range: Orcid
+  role:
+    slot_uri: perseus:role
+    description: Free-text role (no controlled vocabulary in v0.1).
+
+  # --- Research Project ----------------------------------------------------
+  tracker_id:
+    slot_uri: perseus:trackerId
+    description: The row ID in a legacy tracker spreadsheet, when it differs from id.
+  status:
+    slot_uri: perseus:status
+    range: ProjectStatus
+  phase:
+    slot_uri: perseus:phase
+    range: ProjectPhase
+  task:
+    slot_uri: perseus:task
+    range: TaskNumber
+  primary_task:
+    slot_uri: perseus:primaryTask
+    description: The Task the project belongs to; its Objective is the project's Objective.
+    exact_mappings:
+      - datacite:IsPartOf
+    close_mappings:
+      - schema:parentOrganization
+    range: TaskAlignment
+    inlined: true
+  supporting_tasks:
+    slot_uri: perseus:supportingTask
+    range: TaskAlignment
+    multivalued: true
+    inlined_as_list: true
+  leads:
+    slot_uri: perseus:lead
+    description: People doing the work and first points of contact.
+    related_mappings:
+      - datacite:ProjectLeader
+    range: Person
+    multivalued: true
+    inlined_as_list: true
+    minimum_cardinality: 1
+  collaborators:
+    slot_uri: perseus:collaborator
+    related_mappings:
+      - datacite:ProjectMember
+    range: Person
+    multivalued: true
+    inlined_as_list: true
+  lead_institution:
+    slot_uri: perseus:leadInstitution
+    close_mappings:
+      - schema:member
+    related_mappings:
+      - datacite:HostingInstitution
+    range: InstitutionLink
+    inlined: true
+  institutions:
+    slot_uri: perseus:institutions
+    description: Collaborating Institutions, each with a role.
+    close_mappings:
+      - schema:member
+    related_mappings:
+      - datacite:ResearchGroup
+    range: InstitutionRole
+    multivalued: true
+    inlined_as_list: true
+  inputs:
+    slot_uri: perseus:input
+    close_mappings:
+      - schema:object
+    related_mappings:
+      - datacite:Requires
+    range: DatasetLink
+    multivalued: true
+    inlined_as_list: true
+  outputs:
+    slot_uri: perseus:output
+    description: Output Datasets. "Produced by" on the Dataset is generated from this.
+    close_mappings:
+      - schema:result
+    related_mappings:
+      - datacite:IsCompiledBy
+    range: DatasetLink
+    multivalued: true
+    inlined_as_list: true
+  depends_on:
+    slot_uri: perseus:dependsOn
+    description: >-
+      Explicit upstream projects (looser links than shared Datasets). The
+      inverse "provides to" is generated.
+    range: ProjectLink
+    multivalued: true
+    inlined_as_list: true
+  part_of:
+    slot_uri: schema:parentOrganization
+    description: The parent Research Project, when this is a sub-project.
+    exact_mappings:
+      - datacite:IsPartOf
+    range: ProjectLink
+    inlined: true
+  superseded_by:
+    slot_uri: perseus:supersededBy
+    description: The Research Project this one was merged into or replaced by.
+    exact_mappings:
+      - datacite:IsObsoletedBy
+    range: ProjectLink
+    inlined: true
+  related_to:
+    slot_uri: perseus:relatedTo
+    description: Weak association; give a note.
+    range: ProjectLink
+    multivalued: true
+    inlined_as_list: true
+  objective_integration:
+    slot_uri: perseus:objectiveIntegration
+    description: >-
+      Integration Level per Objective, keyed by Objective number. Omit the
+      project's own Objective.
+    range: ObjectiveIntegration
+    inlined: true
+  repositories:
+    slot_uri: schema:codeRepository
+    range: Url
+    multivalued: true
+  funding:
+    slot_uri: schema:funding
+    multivalued: true
+  links:
+    slot_uri: schema:relatedLink
+    range: ExternalLink
+    multivalued: true
+    inlined_as_list: true
+  level:
+    slot_uri: perseus:integrationLevel
+    range: IntegrationLevel
+    required: true
+
+  # --- Software ------------------------------------------------------------
+  kind:
+    slot_uri: perseus:softwareKind
+    range: SoftwareKind
+  maintainers:
+    slot_uri: schema:maintainer
+    range: Person
+    multivalued: true
+    inlined_as_list: true
+    minimum_cardinality: 1
+  repository:
+    slot_uri: schema:codeRepository
+    range: Url
+  version:
+    slot_uri: schema:softwareVersion
+  license:
+    slot_uri: schema:license
+    description: SPDX license identifier, e.g. Apache-2.0.
+  languages:
+    slot_uri: schema:programmingLanguage
+    multivalued: true
+  documentation:
+    slot_uri: schema:softwareHelp
+    range: Url
+  development_status:
+    slot_uri: codemeta:developmentStatus
+    range: DevelopmentStatus
+  fdis_adapter:
+    slot_uri: perseus:fdisAdapter
+    range: FdisAdapterStatus
+
+  # --- Dataset -------------------------------------------------------------
+  source:
+    slot_uri: perseus:source
+    description: The one authoritative source the Dataset points at.
+    related_mappings:
+      - datacite:HasMetadata
+    any_of:
+      - range: StacSource
+      - range: ExternalSource
+    inlined: true
+  stac:
+    slot_uri: perseus:stac
+    range: StacReference
+    inlined: true
+  collection:
+    slot_uri: perseus:stacCollection
+    range: StacId
+  item:
+    slot_uri: perseus:stacItem
+    range: StacId
+  access:
+    slot_uri: perseus:access
+    range: DatasetAccess
+  availability:
+    slot_uri: perseus:availability
+    range: DatasetAvailability
+  variables:
+    slot_uri: schema:variableMeasured
+    description: FDIS variable names, when those exist.
+    multivalued: true
+  fdis_conformance:
+    slot_uri: perseus:fdisConformance
+    description: FDIS Core version or conformance statement.
+
+  # --- Institution ---------------------------------------------------------
+  ror:
+    slot_uri: perseus:ror
+    range: RorId
+
+  # --- Publication ---------------------------------------------------------
+  type:
+    slot_uri: perseus:publicationType
+    range: PublicationType
+  year:
+    slot_uri: schema:datePublished
+    range: integer
+    minimum_value: 1900
+    maximum_value: 2100
+  authors:
+    slot_uri: schema:author
+    range: Person
+    multivalued: true
+    inlined_as_list: true
+  about:
+    slot_uri: schema:about
+    description: The projects, software and datasets the publication is about. The inverse is generated.
+    exact_mappings:
+      - datacite:Documents
+    range: AboutLink
+    multivalued: true
+    inlined_as_list: true
+
+# ---------------------------------------------------------------------------
+# Classes
+# ---------------------------------------------------------------------------
+classes:
+  # --- inline structures ---------------------------------------------------
+  Mention:
+    class_uri: perseus:Mention
+    description: >-
+      A reference, by name only, to something not yet registered. Usable
+      anywhere a link target can go; meant to be promoted to a record later.
+    attributes:
+      name:
+        slot_uri: schema:name
+        required: true
+    slots:
+      - unconfirmed
+      - note
+
+  Person:
+    class_uri: schema:Person
+    description: A person entry inline on a record. Not a record type.
+    attributes:
+      name:
+        slot_uri: schema:name
+        required: true
+    slots:
+      - orcid
+      - institution
+      - role
+      - unconfirmed
+      - note
+    slot_usage:
+      institution:
+        required: true
+
+  TaskAlignment:
+    class_uri: perseus:TaskAlignment
+    slots:
+      - task
+      - unconfirmed
+      - note
+    slot_usage:
+      task:
+        required: true
+
+  InstitutionLink:
+    class_uri: perseus:InstitutionLink
+    slots:
+      - institution
+      - unconfirmed
+      - note
+    slot_usage:
+      institution:
+        required: true
+
+  InstitutionRole:
+    class_uri: perseus:InstitutionRole
+    slots:
+      - institution
+      - role
+      - unconfirmed
+      - note
+    slot_usage:
+      institution:
+        required: true
+
+  DatasetLink:
+    class_uri: perseus:DatasetLink
+    description: An input or output Dataset of a Research Project, optionally via Software.
+    slots:
+      - dataset
+      - via
+      - unconfirmed
+      - note
+    slot_usage:
+      dataset:
+        required: true
+
+  ProjectLink:
+    class_uri: perseus:ProjectLink
+    slots:
+      - project
+      - unconfirmed
+      - note
+    slot_usage:
+      project:
+        required: true
+
+  AboutLink:
+    class_uri: perseus:AboutLink
+    description: Exactly one of project, software or dataset.
+    slots:
+      - project
+      - software
+      - dataset
+      - unconfirmed
+      - note
+    exactly_one_of:
+      - slot_conditions:
+          project:
+            required: true
+      - slot_conditions:
+          software:
+            required: true
+      - slot_conditions:
+          dataset:
+            required: true
+
+  ExternalLink:
+    class_uri: perseus:ExternalLink
+    slots:
+      - url
+      - title
+      - unconfirmed
+      - note
+    slot_usage:
+      url:
+        required: true
+
+  ObjectiveIntegrationEntry:
+    class_uri: perseus:ObjectiveIntegration
+    slots:
+      - level
+      - note
+
+  ObjectiveIntegration:
+    class_uri: perseus:ObjectiveIntegrationMap
+    description: >-
+      Integration Level keyed by Objective number ("1"-"4"). `discuss` acts
+      as the unconfirmed marker.
+    attributes:
+      "1":
+        range: ObjectiveIntegrationEntry
+        inlined: true
+        slot_uri: perseus:objective1
+      "2":
+        range: ObjectiveIntegrationEntry
+        inlined: true
+        slot_uri: perseus:objective2
+      "3":
+        range: ObjectiveIntegrationEntry
+        inlined: true
+        slot_uri: perseus:objective3
+      "4":
+        range: ObjectiveIntegrationEntry
+        inlined: true
+        slot_uri: perseus:objective4
+
+  StacReference:
+    class_uri: perseus:StacReference
+    description: A D2S STAC Collection, or one Item within it.
+    slots:
+      - collection
+      - item
+    slot_usage:
+      collection:
+        required: true
+
+  StacSource:
+    class_uri: perseus:StacSource
+    description: >-
+      A Dataset source in D2S STAC (preferred for spatial data the consortium
+      produces). Exports as DataCite HasMetadata with relatedMetadataScheme STAC.
+    slots:
+      - stac
+    slot_usage:
+      stac:
+        required: true
+
+  ExternalSource:
+    class_uri: perseus:ExternalSource
+    description: >-
+      A Dataset source outside D2S: exactly one of a landing page url or a DOI.
+    slots:
+      - url
+      - doi
+    exactly_one_of:
+      - slot_conditions:
+          url:
+            required: true
+      - slot_conditions:
+          doi:
+            required: true
+
+  # --- record classes ------------------------------------------------------
+  RegistryRecord:
+    abstract: true
+    description: >-
+      One Registry Record, stored as a YAML file. Prose sections are kept in
+      a Markdown body outside the schema.
+
+  ResearchProject:
+    is_a: RegistryRecord
+    class_uri: schema:ResearchProject
+    exact_mappings:
+      - datacite:Project
+    description: >-
+      A consortium work package, research question or effort. Prose sections
+      (Overview, Goals and milestones, Needs from other Objectives,
+      Integration notes, Methods) are Markdown, not fields.
+    slots:
+      - id
+      - title
+      - summary
+      - status
+      - primary_task
+      - leads
+      - lead_institution
+      - tracker_id
+      - phase
+      - supporting_tasks
+      - collaborators
+      - institutions
+      - inputs
+      - outputs
+      - depends_on
+      - part_of
+      - related_to
+      - superseded_by
+      - objective_integration
+      - repositories
+      - funding
+      - links
+    slot_usage:
+      id:
+        range: ProjectId
+        description: Research Project ID, e.g. O2-06.
+      title:
+        required: true
+      summary:
+        required: true
+      status:
+        required: true
+      primary_task:
+        required: true
+      leads:
+        required: true
+      lead_institution:
+        required: true
+
+  Software:
+    is_a: RegistryRecord
+    class_uri: schema:SoftwareSourceCode
+    exact_mappings:
+      - datacite:Software
+    description: >-
+      A model, tool or library a Research Project develops or uses. Needs a
+      repository or a landing url (or both).
+    slots:
+      - id
+      - title
+      - summary
+      - kind
+      - maintainers
+      - repository
+      - url
+      - version
+      - license
+      - languages
+      - documentation
+      - development_status
+      - fdis_adapter
+    slot_usage:
+      title:
+        required: true
+      summary:
+        required: true
+      kind:
+        required: true
+      maintainers:
+        required: true
+    any_of:
+      - slot_conditions:
+          repository:
+            required: true
+      - slot_conditions:
+          url:
+            required: true
+
+  Dataset:
+    is_a: RegistryRecord
+    class_uri: schema:Dataset
+    exact_mappings:
+      - datacite:Dataset
+    description: >-
+      Points at one authoritative source. title and summary are required for
+      external (url/doi) sources (not enforced by the JSON Schema); STAC
+      datasets fetch theirs at build time.
+      "Produced by" and "used by" are generated, not stored.
+    slots:
+      - id
+      - source
+      - access
+      - availability
+      - title
+      - summary
+      - variables
+      - fdis_conformance
+    slot_usage:
+      source:
+        required: true
+      access:
+        required: true
+      availability:
+        required: true
+    # Not enforced by the generated JSON Schema: "title and summary are
+    # required when source is external". LinkML 1.12 drops `range` from
+    # slot_conditions, so the condition cannot be expressed; the form and
+    # site build must check it.
+
+  Institution:
+    is_a: RegistryRecord
+    class_uri: schema:Organization
+    description: An organization or team participating in the consortium.
+    slots:
+      - id
+      - name
+      - short_name
+      - ror
+      - url
+    slot_usage:
+      name:
+        required: true
+
+  Publication:
+    is_a: RegistryRecord
+    class_uri: schema:ScholarlyArticle
+    description: >-
+      A citable output (paper, report, documentation, release). Needs a doi
+      or a url (or both).
+    slots:
+      - id
+      - title
+      - type
+      - year
+      - doi
+      - url
+      - authors
+      - about
+    slot_usage:
+      title:
+        required: true
+      type:
+        required: true
+      year:
+        required: true
+    any_of:
+      - slot_conditions:
+          doi:
+            required: true
+      - slot_conditions:
+          url:
+            required: true

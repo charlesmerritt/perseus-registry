@@ -1,0 +1,14 @@
+# The TreeMap 2022 data publication cited by the D2S TreeMap collection
+# (sci:doi). Title shortened; authors beyond the first omitted.
+id: houtman-2025-treemap-2022
+title: TreeMap 2022 CONUS
+type: other
+year: 2025
+doi: 10.2737/RDS-2025-0032
+authors:
+  - name: Rachel M. Houtman
+    institution:
+      name: USDA Forest Service
+    unconfirmed: true
+about:
+  - dataset: treemap

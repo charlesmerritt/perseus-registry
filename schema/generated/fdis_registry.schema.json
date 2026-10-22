@@ -1,0 +1,1196 @@
+{
+    "$defs": {
+        "AboutLink": {
+            "additionalProperties": false,
+            "description": "Exactly one of project, software or dataset.",
+            "oneOf": [
+                {
+                    "properties": {
+                        "project": {}
+                    },
+                    "required": [
+                        "project"
+                    ]
+                },
+                {
+                    "properties": {
+                        "software": {}
+                    },
+                    "required": [
+                        "software"
+                    ]
+                },
+                {
+                    "properties": {
+                        "dataset": {}
+                    },
+                    "required": [
+                        "dataset"
+                    ]
+                }
+            ],
+            "properties": {
+                "dataset": {
+                    "anyOf": [
+                        {
+                            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+                            "type": "string"
+                        },
+                        {
+                            "$ref": "#/$defs/Mention"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "A Dataset ID, or a Mention of an unregistered dataset."
+                },
+                "note": {
+                    "description": "Short free-text note, e.g. why something is unconfirmed or what a link carries.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "project": {
+                    "anyOf": [
+                        {
+                            "pattern": "^O[1-4]-\\d{2}$",
+                            "type": "string"
+                        },
+                        {
+                            "$ref": "#/$defs/Mention"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "A Research Project ID, or a Mention of an unregistered one."
+                },
+                "software": {
+                    "anyOf": [
+                        {
+                            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+                            "type": "string"
+                        },
+                        {
+                            "$ref": "#/$defs/Mention"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "A Software ID, or a Mention of unregistered software."
+                },
+                "unconfirmed": {
+                    "description": "True when this fact (link, person entry, Task alignment) has been stated but not verified by the people involved. Absent means confirmed.",
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
+                }
+            },
+            "title": "AboutLink",
+            "type": "object"
+        },
+        "Dataset": {
+            "additionalProperties": false,
+            "description": "Points at one authoritative source. title and summary are required for external (url/doi) sources (not enforced by the JSON Schema); STAC datasets fetch theirs at build time. \"Produced by\" and \"used by\" are generated, not stored.",
+            "properties": {
+                "access": {
+                    "$ref": "#/$defs/DatasetAccess"
+                },
+                "availability": {
+                    "$ref": "#/$defs/DatasetAvailability"
+                },
+                "fdis_conformance": {
+                    "description": "FDIS Core version or conformance statement.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "id": {
+                    "description": "Persistent record ID; expands under the Perseus base IRI in JSON-LD.",
+                    "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+                    "type": "string"
+                },
+                "source": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/StacSource"
+                        },
+                        {
+                            "$ref": "#/$defs/ExternalSource"
+                        }
+                    ],
+                    "description": "The one authoritative source the Dataset points at."
+                },
+                "summary": {
+                    "description": "One- or two-sentence summary. Longer prose goes in the Markdown body.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "title": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "variables": {
+                    "description": "FDIS variable names, when those exist.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "id",
+                "source",
+                "access",
+                "availability"
+            ],
+            "title": "Dataset",
+            "type": "object"
+        },
+        "DatasetAccess": {
+            "description": "",
+            "enum": [
+                "public",
+                "consortium",
+                "restricted"
+            ],
+            "title": "DatasetAccess",
+            "type": "string"
+        },
+        "DatasetAvailability": {
+            "description": "",
+            "enum": [
+                "planned",
+                "in_progress",
+                "published",
+                "withdrawn"
+            ],
+            "title": "DatasetAvailability",
+            "type": "string"
+        },
+        "DatasetLink": {
+            "additionalProperties": false,
+            "description": "An input or output Dataset of a Research Project, optionally via Software.",
+            "properties": {
+                "dataset": {
+                    "anyOf": [
+                        {
+                            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+                            "type": "string"
+                        },
+                        {
+                            "$ref": "#/$defs/Mention"
+                        }
+                    ],
+                    "description": "A Dataset ID, or a Mention of an unregistered dataset."
+                },
+                "note": {
+                    "description": "Short free-text note, e.g. why something is unconfirmed or what a link carries.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "unconfirmed": {
+                    "description": "True when this fact (link, person entry, Task alignment) has been stated but not verified by the people involved. Absent means confirmed.",
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
+                },
+                "via": {
+                    "anyOf": [
+                        {
+                            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+                            "type": "string"
+                        },
+                        {
+                            "$ref": "#/$defs/Mention"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "The Software that consumes or produces the Dataset (ID or Mention)."
+                }
+            },
+            "required": [
+                "dataset"
+            ],
+            "title": "DatasetLink",
+            "type": "object"
+        },
+        "DevelopmentStatus": {
+            "description": "repostatus.org values, as used by CodeMeta developmentStatus.",
+            "enum": [
+                "concept",
+                "wip",
+                "suspended",
+                "abandoned",
+                "active",
+                "inactive",
+                "unsupported",
+                "moved"
+            ],
+            "title": "DevelopmentStatus",
+            "type": "string"
+        },
+        "ExternalLink": {
+            "additionalProperties": false,
+            "description": "",
+            "properties": {
+                "note": {
+                    "description": "Short free-text note, e.g. why something is unconfirmed or what a link carries.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "title": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "unconfirmed": {
+                    "description": "True when this fact (link, person entry, Task alignment) has been stated but not verified by the people involved. Absent means confirmed.",
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
+                },
+                "url": {
+                    "format": "uri",
+                    "pattern": "^https?://\\S+$",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "url"
+            ],
+            "title": "ExternalLink",
+            "type": "object"
+        },
+        "ExternalSource": {
+            "additionalProperties": false,
+            "description": "A Dataset source outside D2S: exactly one of a landing page url or a DOI.",
+            "oneOf": [
+                {
+                    "properties": {
+                        "url": {}
+                    },
+                    "required": [
+                        "url"
+                    ]
+                },
+                {
+                    "properties": {
+                        "doi": {}
+                    },
+                    "required": [
+                        "doi"
+                    ]
+                }
+            ],
+            "properties": {
+                "doi": {
+                    "pattern": "^10\\.\\d{4,9}/\\S+$",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "url": {
+                    "format": "uri",
+                    "pattern": "^https?://\\S+$",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            },
+            "title": "ExternalSource",
+            "type": "object"
+        },
+        "FdisAdapterStatus": {
+            "description": "",
+            "enum": [
+                "none",
+                "planned",
+                "in_progress",
+                "done"
+            ],
+            "title": "FdisAdapterStatus",
+            "type": "string"
+        },
+        "Institution": {
+            "additionalProperties": false,
+            "description": "An organization or team participating in the consortium.",
+            "properties": {
+                "id": {
+                    "description": "Persistent record ID; expands under the Perseus base IRI in JSON-LD.",
+                    "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "ror": {
+                    "pattern": "^https://ror\\.org/0[a-z0-9]{8}$",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "short_name": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "url": {
+                    "format": "uri",
+                    "pattern": "^https?://\\S+$",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "id",
+                "name"
+            ],
+            "title": "Institution",
+            "type": "object"
+        },
+        "InstitutionLink": {
+            "additionalProperties": false,
+            "description": "",
+            "properties": {
+                "institution": {
+                    "anyOf": [
+                        {
+                            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+                            "type": "string"
+                        },
+                        {
+                            "$ref": "#/$defs/Mention"
+                        }
+                    ],
+                    "description": "An Institution ID, or a Mention of an unregistered institution."
+                },
+                "note": {
+                    "description": "Short free-text note, e.g. why something is unconfirmed or what a link carries.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "unconfirmed": {
+                    "description": "True when this fact (link, person entry, Task alignment) has been stated but not verified by the people involved. Absent means confirmed.",
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "institution"
+            ],
+            "title": "InstitutionLink",
+            "type": "object"
+        },
+        "InstitutionRole": {
+            "additionalProperties": false,
+            "description": "",
+            "properties": {
+                "institution": {
+                    "anyOf": [
+                        {
+                            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+                            "type": "string"
+                        },
+                        {
+                            "$ref": "#/$defs/Mention"
+                        }
+                    ],
+                    "description": "An Institution ID, or a Mention of an unregistered institution."
+                },
+                "note": {
+                    "description": "Short free-text note, e.g. why something is unconfirmed or what a link carries.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "role": {
+                    "description": "Free-text role (no controlled vocabulary in v0.1).",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "unconfirmed": {
+                    "description": "True when this fact (link, person entry, Task alignment) has been stated but not verified by the people involved. Absent means confirmed.",
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "institution"
+            ],
+            "title": "InstitutionRole",
+            "type": "object"
+        },
+        "IntegrationLevel": {
+            "description": "How strongly a Research Project connects to an Objective. `discuss` means a connection is suspected but not confirmed.",
+            "enum": [
+                "n/a",
+                "informational",
+                "collaborative",
+                "integrated",
+                "discuss"
+            ],
+            "title": "IntegrationLevel",
+            "type": "string"
+        },
+        "Mention": {
+            "additionalProperties": false,
+            "description": "A reference, by name only, to something not yet registered. Usable anywhere a link target can go; meant to be promoted to a record later.",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "note": {
+                    "description": "Short free-text note, e.g. why something is unconfirmed or what a link carries.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "unconfirmed": {
+                    "description": "True when this fact (link, person entry, Task alignment) has been stated but not verified by the people involved. Absent means confirmed.",
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "name"
+            ],
+            "title": "Mention",
+            "type": "object"
+        },
+        "ObjectiveIntegration": {
+            "additionalProperties": false,
+            "description": "Integration Level keyed by Objective number (\"1\"-\"4\"). `discuss` acts as the unconfirmed marker.",
+            "properties": {
+                "1": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/ObjectiveIntegrationEntry"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "2": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/ObjectiveIntegrationEntry"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "3": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/ObjectiveIntegrationEntry"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "4": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/ObjectiveIntegrationEntry"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                }
+            },
+            "title": "ObjectiveIntegration",
+            "type": "object"
+        },
+        "ObjectiveIntegrationEntry": {
+            "additionalProperties": false,
+            "description": "",
+            "properties": {
+                "level": {
+                    "$ref": "#/$defs/IntegrationLevel"
+                },
+                "note": {
+                    "description": "Short free-text note, e.g. why something is unconfirmed or what a link carries.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "level"
+            ],
+            "title": "ObjectiveIntegrationEntry",
+            "type": "object"
+        },
+        "ObjectiveNumber": {
+            "description": "",
+            "enum": [
+                "1",
+                "2",
+                "3",
+                "4"
+            ],
+            "title": "ObjectiveNumber",
+            "type": "string"
+        },
+        "Person": {
+            "additionalProperties": false,
+            "description": "A person entry inline on a record. Not a record type.",
+            "properties": {
+                "institution": {
+                    "anyOf": [
+                        {
+                            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+                            "type": "string"
+                        },
+                        {
+                            "$ref": "#/$defs/Mention"
+                        }
+                    ],
+                    "description": "An Institution ID, or a Mention of an unregistered institution."
+                },
+                "name": {
+                    "type": "string"
+                },
+                "note": {
+                    "description": "Short free-text note, e.g. why something is unconfirmed or what a link carries.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "orcid": {
+                    "pattern": "^\\d{4}-\\d{4}-\\d{4}-\\d{3}[\\dX]$",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "role": {
+                    "description": "Free-text role (no controlled vocabulary in v0.1).",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "unconfirmed": {
+                    "description": "True when this fact (link, person entry, Task alignment) has been stated but not verified by the people involved. Absent means confirmed.",
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "institution",
+                "name"
+            ],
+            "title": "Person",
+            "type": "object"
+        },
+        "ProjectLink": {
+            "additionalProperties": false,
+            "description": "",
+            "properties": {
+                "note": {
+                    "description": "Short free-text note, e.g. why something is unconfirmed or what a link carries.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "project": {
+                    "anyOf": [
+                        {
+                            "pattern": "^O[1-4]-\\d{2}$",
+                            "type": "string"
+                        },
+                        {
+                            "$ref": "#/$defs/Mention"
+                        }
+                    ],
+                    "description": "A Research Project ID, or a Mention of an unregistered one."
+                },
+                "unconfirmed": {
+                    "description": "True when this fact (link, person entry, Task alignment) has been stated but not verified by the people involved. Absent means confirmed.",
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "project"
+            ],
+            "title": "ProjectLink",
+            "type": "object"
+        },
+        "ProjectPhase": {
+            "description": "Research Project phase. Tracker mapping: Concept / Development -> concept; Development -> development; Testing / Validation -> validation; Integration / Implementation -> integration; Operational / Ongoing -> operational.",
+            "enum": [
+                "concept",
+                "development",
+                "validation",
+                "integration",
+                "operational"
+            ],
+            "title": "ProjectPhase",
+            "type": "string"
+        },
+        "ProjectStatus": {
+            "description": "Research Project lifecycle status.",
+            "enum": [
+                "proposed",
+                "active",
+                "paused",
+                "completed",
+                "superseded",
+                "archived"
+            ],
+            "title": "ProjectStatus",
+            "type": "string"
+        },
+        "Publication": {
+            "additionalProperties": false,
+            "anyOf": [
+                {
+                    "properties": {
+                        "doi": {}
+                    },
+                    "required": [
+                        "doi"
+                    ]
+                },
+                {
+                    "properties": {
+                        "url": {}
+                    },
+                    "required": [
+                        "url"
+                    ]
+                }
+            ],
+            "description": "A citable output (paper, report, documentation, release). Needs a doi or a url (or both).",
+            "properties": {
+                "about": {
+                    "description": "The projects, software and datasets the publication is about. The inverse is generated.",
+                    "items": {
+                        "$ref": "#/$defs/AboutLink"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "authors": {
+                    "items": {
+                        "$ref": "#/$defs/Person"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "doi": {
+                    "pattern": "^10\\.\\d{4,9}/\\S+$",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "id": {
+                    "description": "Persistent record ID; expands under the Perseus base IRI in JSON-LD.",
+                    "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/$defs/PublicationType"
+                },
+                "url": {
+                    "format": "uri",
+                    "pattern": "^https?://\\S+$",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "year": {
+                    "maximum": 2100,
+                    "minimum": 1900,
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "id",
+                "title",
+                "type",
+                "year"
+            ],
+            "title": "Publication",
+            "type": "object"
+        },
+        "PublicationType": {
+            "description": "",
+            "enum": [
+                "article",
+                "report",
+                "thesis",
+                "presentation",
+                "release",
+                "other"
+            ],
+            "title": "PublicationType",
+            "type": "string"
+        },
+        "RegistryRecord": {
+            "additionalProperties": false,
+            "description": "One Registry Record, stored as a YAML file. Prose sections are kept in a Markdown body outside the schema.",
+            "title": "RegistryRecord",
+            "type": "object"
+        },
+        "ResearchProject": {
+            "additionalProperties": false,
+            "description": "A consortium work package, research question or effort. Prose sections (Overview, Goals and milestones, Needs from other Objectives, Integration notes, Methods) are Markdown, not fields.",
+            "properties": {
+                "collaborators": {
+                    "items": {
+                        "$ref": "#/$defs/Person"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "depends_on": {
+                    "description": "Explicit upstream projects (looser links than shared Datasets). The inverse \"provides to\" is generated.",
+                    "items": {
+                        "$ref": "#/$defs/ProjectLink"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "funding": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "id": {
+                    "description": "Research Project ID, e.g. O2-06.",
+                    "pattern": "^O[1-4]-\\d{2}$",
+                    "type": "string"
+                },
+                "inputs": {
+                    "items": {
+                        "$ref": "#/$defs/DatasetLink"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "institutions": {
+                    "description": "Collaborating Institutions, each with a role.",
+                    "items": {
+                        "$ref": "#/$defs/InstitutionRole"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "lead_institution": {
+                    "$ref": "#/$defs/InstitutionLink"
+                },
+                "leads": {
+                    "description": "People doing the work and first points of contact.",
+                    "items": {
+                        "$ref": "#/$defs/Person"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                },
+                "links": {
+                    "items": {
+                        "$ref": "#/$defs/ExternalLink"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "objective_integration": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/ObjectiveIntegration"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "Integration Level per Objective, keyed by Objective number. Omit the project's own Objective."
+                },
+                "outputs": {
+                    "description": "Output Datasets. \"Produced by\" on the Dataset is generated from this.",
+                    "items": {
+                        "$ref": "#/$defs/DatasetLink"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "part_of": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/ProjectLink"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "The parent Research Project, when this is a sub-project."
+                },
+                "phase": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/ProjectPhase"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "primary_task": {
+                    "$ref": "#/$defs/TaskAlignment",
+                    "description": "The Task the project belongs to; its Objective is the project's Objective."
+                },
+                "related_to": {
+                    "description": "Weak association; give a note.",
+                    "items": {
+                        "$ref": "#/$defs/ProjectLink"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "repositories": {
+                    "items": {
+                        "format": "uri",
+                        "pattern": "^https?://\\S+$",
+                        "type": "string"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "status": {
+                    "$ref": "#/$defs/ProjectStatus"
+                },
+                "summary": {
+                    "description": "One- or two-sentence summary. Longer prose goes in the Markdown body.",
+                    "type": "string"
+                },
+                "superseded_by": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/ProjectLink"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "The Research Project this one was merged into or replaced by."
+                },
+                "supporting_tasks": {
+                    "items": {
+                        "$ref": "#/$defs/TaskAlignment"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "title": {
+                    "type": "string"
+                },
+                "tracker_id": {
+                    "description": "The row ID in a legacy tracker spreadsheet, when it differs from id.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "id",
+                "title",
+                "summary",
+                "status",
+                "primary_task",
+                "leads",
+                "lead_institution"
+            ],
+            "title": "ResearchProject",
+            "type": "object"
+        },
+        "Software": {
+            "additionalProperties": false,
+            "anyOf": [
+                {
+                    "properties": {
+                        "repository": {}
+                    },
+                    "required": [
+                        "repository"
+                    ]
+                },
+                {
+                    "properties": {
+                        "url": {}
+                    },
+                    "required": [
+                        "url"
+                    ]
+                }
+            ],
+            "description": "A model, tool or library a Research Project develops or uses. Needs a repository or a landing url (or both).",
+            "properties": {
+                "development_status": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/DevelopmentStatus"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "documentation": {
+                    "format": "uri",
+                    "pattern": "^https?://\\S+$",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "fdis_adapter": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/FdisAdapterStatus"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "id": {
+                    "description": "Persistent record ID; expands under the Perseus base IRI in JSON-LD.",
+                    "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+                    "type": "string"
+                },
+                "kind": {
+                    "$ref": "#/$defs/SoftwareKind"
+                },
+                "languages": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "license": {
+                    "description": "SPDX license identifier, e.g. Apache-2.0.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "maintainers": {
+                    "items": {
+                        "$ref": "#/$defs/Person"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                },
+                "repository": {
+                    "format": "uri",
+                    "pattern": "^https?://\\S+$",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "summary": {
+                    "description": "One- or two-sentence summary. Longer prose goes in the Markdown body.",
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "url": {
+                    "format": "uri",
+                    "pattern": "^https?://\\S+$",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "version": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "id",
+                "title",
+                "summary",
+                "kind",
+                "maintainers"
+            ],
+            "title": "Software",
+            "type": "object"
+        },
+        "SoftwareKind": {
+            "description": "",
+            "enum": [
+                "model",
+                "tool",
+                "library"
+            ],
+            "title": "SoftwareKind",
+            "type": "string"
+        },
+        "StacReference": {
+            "additionalProperties": false,
+            "description": "A D2S STAC Collection, or one Item within it.",
+            "properties": {
+                "collection": {
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
+                    "type": "string"
+                },
+                "item": {
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "collection"
+            ],
+            "title": "StacReference",
+            "type": "object"
+        },
+        "StacSource": {
+            "additionalProperties": false,
+            "description": "A Dataset source in D2S STAC (preferred for spatial data the consortium produces). Exports as DataCite HasMetadata with relatedMetadataScheme STAC.",
+            "properties": {
+                "stac": {
+                    "$ref": "#/$defs/StacReference"
+                }
+            },
+            "required": [
+                "stac"
+            ],
+            "title": "StacSource",
+            "type": "object"
+        },
+        "TaskAlignment": {
+            "additionalProperties": false,
+            "description": "",
+            "properties": {
+                "note": {
+                    "description": "Short free-text note, e.g. why something is unconfirmed or what a link carries.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "task": {
+                    "pattern": "^[1-4]\\.\\d+$",
+                    "type": "string"
+                },
+                "unconfirmed": {
+                    "description": "True when this fact (link, person entry, Task alignment) has been stated but not verified by the people involved. Absent means confirmed.",
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "task"
+            ],
+            "title": "TaskAlignment",
+            "type": "object"
+        }
+    },
+    "$id": "https://w3id.org/perseus/fdis-registry",
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "additionalProperties": true,
+    "metamodel_version": "1.12.0",
+    "title": "fdis_registry",
+    "type": "object",
+    "version": "0.1.0"
+}
+
