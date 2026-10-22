@@ -3,7 +3,7 @@ title: How are relationships between records represented, and which record owns 
 labels: [wayfinder:grilling]
 parent: 1
 blocked_by: [3, 4]
-assignee:
+assignee: chazm
 status: open
 ---
 
