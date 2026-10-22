@@ -14,7 +14,7 @@ A demonstrable prototype of the Perseus research registry: a **static wiki** gen
 - Source data: `sources/objective2-tracker.csv` (Obj 2 tracker, ~14 Research Projects with O2-xx IDs).
 - **Execution override**: this map carries through to *building* the prototype. Once the decisions are clear, build tickets graduate from the fog.
 - Standing preferences: a wiki plus data standards for cross-project and cross-institution collaboration and ease of use downstream, *not* a dynamic or computational app. Anything derived (backlinks, "used by" lists) is generated statically at build time. Portability matters most: the records must stay usable without the site.
-- Contributors may not use Git: provide copyable templates; a coordinator merges.
+- **GUI first** (user direction, while working on the relationship ticket): contributors create and edit records through fillable forms in the app, or upload a YAML file that conforms to the official schema. YAML is the storage and interchange format underneath, never something contributors are required to write. Contributors may not use Git.
 - D2S STAC (`stac.d2s.org/api/v1/`) is read-only and authoritative for spatial dataset metadata.
 - Skills to consult: `grilling` and `domain-modeling` for grilling tickets; `prototype` for prototype tickets.
 
@@ -24,6 +24,7 @@ A demonstrable prototype of the Perseus research registry: a **static wiki** gen
 - [What does the D2S STAC catalog actually contain and expose?](0002-d2s-stac-catalog-survey.md): public, CORS-open, fast enough to fetch at build time; IDs are UUIDs or slugs; TreeMap, biomass, and LiDAR exist; metadata is thin; keep a cached snapshot.
 - [Which existing metadata standards should the registry borrow its vocabulary from?](0003-relationship-vocabulary-prior-art.md): schema.org types + DataCite 4.6 relations (7 borrowed, inverses generated); Project dependsOn/uses, Integration Level, Tasks, and unregistered targets are Perseus-specific.
 - [Which tracker columns become registry fields, which become wiki prose, and which stay in the meeting tracker?](0004-tracker-vs-registry-boundary.md): registry stands alone and the tracker is only a seed; durable columns become fields or prose and meeting logistics aren't imported; PI Ambassador is dropped (moves to the Objective/Task level); unconfirmed facts get an explicit marker.
+- [How are relationships between records represented, and which record owns each link?](0005-relationship-model.md): links embedded on one owning record, inverses generated; inputs/outputs on the Research Project (optional `via` Software); dependencies generated from matching datasets plus declared ones; Datasets may point at STAC or an external source; Mentions for unregistered things; Integration Level is a per-Objective map.
 - Canonical terms: **Research Project** (not "project"/"workstream"), **Software** with `kind: model | tool | library` (see `CONTEXT.md`).
 
 ## Not yet specified
@@ -39,5 +40,5 @@ A demonstrable prototype of the Perseus research registry: a **static wiki** gen
 
 - Dynamic or computational features: live queries, graph analytics, a search backend (user direction while charting).
 - Writing to D2S STAC or publishing model outputs automatically (stage 2 of the original proposal).
-- A browser editor backed by a database; authentication and permissions.
+- Authentication and permissions beyond what the chosen submission flow strictly needs.
 - Drafting FDIS Core or the FDIS Publication Profile.

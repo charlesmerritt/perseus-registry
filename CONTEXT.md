@@ -39,7 +39,11 @@ A model, tool, or library a Research Project develops or uses. One record type d
 _Avoid_: treating Model and Tool as separate record types
 
 **Dataset**:
-A registry record that points at an authoritative STAC Collection or Item; the registry holds only research-side facts (responsible project, role, access status), never duplicate spatial metadata.
+A registry record that points at one authoritative source: a D2S STAC Collection or Item (preferred for spatial data the consortium produces) or an external landing page or DOI (e.g. FIA). The registry holds only research-side facts, never duplicate source metadata.
+
+**Mention**:
+A reference, by name only, to something not yet registered (e.g. "Obj 3 landowner typologies"), usable anywhere a link can go. A Mention is meant to be promoted to a record later.
+_Avoid_: stub record
 
 **Institution**:
 An organization or team participating in the consortium.
@@ -48,14 +52,14 @@ An organization or team participating in the consortium.
 A citable output: paper, report, documentation, or release, usually with a DOI.
 
 **Registry Record**:
-One YAML file describing one entity of the above types, identified by a persistent ID (e.g. `perseus:spatial-forest-forecasting`) that never changes when titles or leads change.
+One entity of the above types, conforming to the official schema and stored as YAML (contributors normally create it through a form), identified by a persistent ID (e.g. `perseus:spatial-forest-forecasting`) that never changes when titles or leads change.
 
 ## Relationships
 
 - A **Research Project** is led by one **Institution** and may have collaborating **Institutions**
-- A **Research Project** develops or uses **Software**
-- **Software** consumes and produces **Datasets**
-- A **Dataset** references exactly one STAC Collection or Item in D2S
+- A **Research Project** has input and output **Datasets**, each optionally via a piece of **Software**
+- A **Research Project** may depend on, be part of, be superseded by, or be related to another **Research Project**
+- A **Dataset** references exactly one authoritative source: a STAC Collection or Item in D2S, or an external source
 - A **Publication** is associated with **Research Projects** and **Datasets**
 
 ## Flagged ambiguities
