@@ -3,7 +3,7 @@ title: Write the FDIS Registry Profile v0.1 schema in LinkML
 labels: [wayfinder:task]
 parent: 1
 blocked_by: []
-assignee:
+assignee: claude (background agent)
 status: open
 ---
 
