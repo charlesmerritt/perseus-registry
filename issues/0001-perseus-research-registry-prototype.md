@@ -25,14 +25,14 @@ A demonstrable prototype of the Perseus research registry: a **static wiki** gen
 - [Which existing metadata standards should the registry borrow its vocabulary from?](0003-relationship-vocabulary-prior-art.md): schema.org types + DataCite 4.6 relations (7 borrowed, inverses generated); Project dependsOn/uses, Integration Level, Tasks, and unregistered targets are Perseus-specific.
 - [Which tracker columns become registry fields, which become wiki prose, and which stay in the meeting tracker?](0004-tracker-vs-registry-boundary.md): registry stands alone and the tracker is only a seed; durable columns become fields or prose and meeting logistics aren't imported; PI Ambassador is dropped (moves to the Objective/Task level); unconfirmed facts get an explicit marker.
 - [How are relationships between records represented, and which record owns each link?](0005-relationship-model.md): links embedded on one owning record, inverses generated; inputs/outputs on the Research Project (optional `via` Software); dependencies generated from matching datasets plus declared ones; Datasets may point at STAC or an external source; Mentions for unregistered things; Integration Level is a per-Objective map.
+- [What are the fields, identifiers, and controlled vocabularies for each record type?](0006-record-schemas-and-ids.md): project IDs `O2-06` style (never change), slugs for other types; LinkML source with committed JSON Schema + JSON-LD; status vs phase; people inline with ORCID; `unconfirmed` marker allows placeholders.
 - Canonical terms: **Research Project** (not "project"/"workstream"), **Software** with `kind: model | tool | library` (see `CONTEXT.md`).
 
 ## Not yet specified
 
-- **Build-out**: the generator, seeding records from the tracker, and CI validation. Graduates once the schema and site stack are decided.
+- **Build-out**: the site generator, form implementation, and CI validation and publishing. Graduates once the site stack and submission flow are decided (schema writing and seeding are already tickets).
 - **Public vs internal information**: the tracker has internal notes ("Discussion needed", status confirmations). Do some fields stay off a public site, or is the whole wiki consortium-internal?
 - **Objective and Task structure**: the fixed Objectives (1 Measurement, 2 Modeling, 3 Management, 4 Mindset) and their numbered Tasks come from consortium documentation not yet in the repo. They likely become higher-order records or pages with their own PI leads (where PI Ambassadors land). Only Obj 2 has a project list; do Objectives 1, 3, 4 get placeholder pages in the prototype? User will supply the documentation later.
-- **People**: are researchers records of their own (with ORCID), or names on Research Projects? Hangs on the relationship model.
 - **Versioning**: Software versions, model runs, dataset releases. How much does a prototype need?
 - **Hosting and handoff**: where the demo site lives (GitHub Pages?) and who maintains it afterward.
 

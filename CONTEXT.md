@@ -21,6 +21,9 @@ A numbered subdivision of an Objective (e.g. 2.1 Landowner Optimization, 2.4 Dat
 A person doing the work of a Research Project, and its first point of contact. Often a student or postdoc.
 _Avoid_: PI Ambassador (a tracker role for PIs; belongs at the Objective/Task level, not on a Research Project)
 
+**Person**:
+Not a record type. People appear inline on records (name, optional ORCID, institution, role); ORCID is the preferred way to identify them across records.
+
 **Unconfirmed**:
 A marker on a structured fact (a link, role, or Task alignment) that has been stated but not verified by the people involved. Shown visibly so the right person can confirm or correct it.
 
@@ -52,7 +55,7 @@ An organization or team participating in the consortium.
 A citable output: paper, report, documentation, or release, usually with a DOI.
 
 **Registry Record**:
-One entity of the above types, conforming to the official schema and stored as YAML (contributors normally create it through a form), identified by a persistent ID (e.g. `perseus:spatial-forest-forecasting`) that never changes when titles or leads change.
+One entity of the above types, conforming to the official schema and stored as YAML (contributors normally create it through a form), identified by a persistent ID that never changes when titles, leads, or Objectives change: `O2-06` style for Research Projects, a short slug (`treemap`, `landis-ii`) for other types.
 
 ## Relationships
 
