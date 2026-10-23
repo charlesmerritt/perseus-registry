@@ -3,7 +3,7 @@ title: Seed the Objective 2 records from the tracker
 labels: [wayfinder:task]
 parent: 1
 blocked_by: [9]
-assignee:
+assignee: claude
 status: open
 ---
 
