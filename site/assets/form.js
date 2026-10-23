@@ -1,13 +1,13 @@
-// Schema-driven Research Project form (issue 0008).
+// Schema-driven Research Project form (issue 0008): a step wizard that ends in
+// a GitHub submission issue, which a coordinator reviews and merges.
 // Fields come from the generated JSON Schema ($defs/ResearchProject); the only
 // hand-written parts are UI hints (section grouping, which registry list a
-// picker draws from, labels). Three layouts share one record in memory.
-// Nothing is persisted.
+// picker draws from, labels). Nothing is persisted.
 (function () {
   const SCHEMA = window.SCHEMA, REG = window.REGISTRY, defs = SCHEMA.$defs;
   const CLASS = "ResearchProject";
   const GH = "https://github.com/OWNER/perseus-registry"; // placeholder: repo has no remote yet
-  const COORDINATOR = "registry-coordinator@example.org"; // placeholder
+  const MAX_URL = 8000; // GitHub rejects longer prefilled URLs
 
   // ---- UI hints (the non-schema part) ----
   const SECTIONS = [
@@ -30,7 +30,7 @@
 
   // ---- state ----
   const params = new URLSearchParams(location.search);
-  const S = { rec: {}, prose: {}, editing: null, proseStyle: "sidecar", dest: params.get("dest") || "b", step: 0, errors: [] };
+  const S = { rec: {}, prose: {}, editing: null, step: 0, errors: [] };
   const editId = params.get("edit");
   if (editId && REG.projects[editId]) loadExisting(editId);
   else newRecord();
@@ -45,7 +45,6 @@
     S.editing = id;
     S.rec = structuredClone(p.record);
     S.prose = parseProse(p.body);
-    S.proseStyle = p.file.endsWith(".md") ? "frontmatter" : "sidecar";
   }
   function parseProse(body) {
     const out = Object.fromEntries(REG.prose.map((h) => [h, ""]));
@@ -60,6 +59,7 @@
     return `RP-${String(Math.max(0, ...used) + 1).padStart(2, "0")}`;
   }
   const currentId = () => S.editing || nextId();
+  const heading = () => (S.editing ? `Editing ${S.editing}` : `New Research Project → ${currentId()}`);
 
   // ---- path helpers ----
   const getAt = (path) => path.reduce((o, k) => (o == null ? undefined : o[k]), S.rec);
@@ -226,11 +226,7 @@
 
   function proseSection() {
     const box = h("div", {});
-    box.append(h("p", { class: "f-help" }, "Free-form wiki text. Each box becomes a ## section of the record's Markdown body."),
-      h("div", { class: "f-row" }, h("label", { class: "f-label" }, "Store prose as"),
-        h("select", { onchange: (ev) => { S.proseStyle = ev.target.value; changed(); } },
-          h("option", { value: "sidecar", selected: S.proseStyle === "sidecar" }, "Two files: ID.yaml + ID.md"),
-          h("option", { value: "frontmatter", selected: S.proseStyle === "frontmatter" }, "One file: ID.md with YAML frontmatter"))));
+    box.append(h("p", { class: "f-help" }, "Free-form wiki text. Each box becomes a ## section below the record's fields in ID.md."));
     for (const hd of REG.prose) {
       box.append(h("div", { class: "f-row" }, h("label", { class: "f-label" }, hd),
         h("textarea", { rows: 4, oninput: (ev) => { S.prose[hd] = ev.target.value; changed(); } }, S.prose[hd] || "")));
@@ -263,11 +259,8 @@
     for (const k of ORDER) if (k in rec) ordered[k] = rec[k];
     const body = REG.prose.filter((hd) => (S.prose[hd] || "").trim()).map((hd) => `## ${hd}\n\n${S.prose[hd].trim()}\n`).join("\n");
     const yaml = jsyaml.dump(ordered, { lineWidth: 78, noRefs: true });
-    const dir = "records/research-project/";
-    const files = S.proseStyle === "frontmatter"
-      ? [{ path: `${dir}${id || "NEW"}.md`, text: `---\n${yaml}---\n\n${body}` }]
-      : [{ path: `${dir}${id || "NEW"}.yaml`, text: yaml }, ...(body ? [{ path: `${dir}${id || "NEW"}.md`, text: body }] : [])];
-    return { rec: ordered, yaml, files };
+    const file = { path: `records/research-project/${id}.md`, text: `---\n${yaml}---\n${body ? "\n" + body : ""}` };
+    return { rec: ordered, file };
   }
 
   // ---- validation (Ajv against the generated JSON Schema) ----
@@ -302,34 +295,32 @@
     const anyOfPaths = Object.values(best).filter((x) => x.r === 1).map((x) => x.path);
     S.errors = Object.values(best).filter((x) => !anyOfPaths.some((p) => x.path !== p && x.path.startsWith(p + "/")));
     // checks the JSON Schema cannot express, done here and again at site build
-    for (const [i, l] of (rec.inputs || []).concat(rec.outputs || []).entries())
-      if (typeof l.dataset === "object" && !l.dataset.name) S.errors.push({ path: `/inputs/${i}/dataset`, msg: "name the Mention" });
+    for (const key of ["inputs", "outputs"])
+      for (const [i, l] of (rec[key] || []).entries())
+        if (typeof l.dataset === "object" && !l.dataset.name) S.errors.push({ path: `/${key}/${i}/dataset`, msg: "name the Mention" });
     return ok && !S.errors.length;
   }
 
-  // ---- render layouts ----
+  // ---- render ----
   let root;
-  function layoutRoot() {
-    const sec = [...document.querySelectorAll("section.variant")].find((s) => !s.hidden);
-    return sec && sec.querySelector(".submit-root");
-  }
   function topBar() {
     const projects = Object.entries(REG.projects).map(([id, p]) => h("option", { value: id, selected: id === S.editing }, `${id} · ${p.title}`));
-    const up = h("input", { type: "file", accept: ".yaml,.yml,.md", style: "display:none", onchange: (ev) => upload(ev.target.files[0]) });
+    const up = h("input", { type: "file", accept: ".md,.yaml,.yml", style: "display:none", onchange: (ev) => upload(ev.target.files[0]) });
     return h("div", { class: "f-top" },
-      h("b", {}, S.editing ? `Editing ${S.editing}` : `New Research Project ${currentId() ? "→ " + currentId() : ""}`),
-      h("button", { type: "button", class: "btn ghost", onclick: () => { newRecord(); render(); } }, "New"),
+      h("b", {}, heading()),
+      h("button", { type: "button", class: "btn ghost", onclick: () => { newRecord(); S.step = 0; render(); } }, "New"),
       h("select", { onchange: (ev) => { if (ev.target.value) { loadExisting(ev.target.value); render(); } } },
         h("option", { value: "" }, "Edit an existing record…"), projects),
-      h("button", { type: "button", class: "btn ghost", onclick: () => up.click() }, "Upload a YAML file"), up,
+      h("button", { type: "button", class: "btn ghost", onclick: () => up.click() }, "Upload a record file"), up,
       h("span", { class: "f-status" }));
   }
   async function upload(file) {
     if (!file) return;
-    const text = await file.text();
+    const text = (await file.text()).replace(/\r\n/g, "\n");
     try {
       let rec, body = "";
-      if (text.startsWith("---")) { const [, fm, b] = text.split(/^---\s*$/m); rec = jsyaml.load(fm); body = b; }
+      const fm = text.match(/^---\n([\s\S]*?)^---\n([\s\S]*)$/m);
+      if (fm && text.startsWith("---\n")) { rec = jsyaml.load(fm[1]); body = fm[2]; }
       else rec = jsyaml.load(text);
       S.rec = rec; S.prose = parseProse(body);
       S.editing = REG.projects[rec.id] ? rec.id : null;
@@ -337,56 +328,44 @@
     } catch (ex) { alertInline("Could not read that file: " + ex.message); }
   }
 
+  // The issue body format scripts/submission.py parses: the path in backticks,
+  // then the file in a fence longer than any backtick run inside it.
+  function issueBody(f) {
+    const fence = "`".repeat(Math.max(3, ...(f.text.match(/`+/g) || []).map((r) => r.length + 1)));
+    return `\`${f.path}\`\n\n${fence}markdown\n${f.text}${fence}\n`;
+  }
   function destPanel() {
     const box = h("div", { class: "dest" });
     const draw = () => {
       const ok = validate();
-      const { files } = output();
-      const tabs = [["a", "(a) Save to registry"], ["b", "(b) Propose on GitHub"], ["c", "(c) Download, send to coordinator"]];
-      const out = h("div", { class: "dest-out" });
-      if (!ok) out.append(h("p", { class: "f-err" }, `Fix ${S.errors.length} problem(s) first. You can still download a draft under (c).`));
-      if (S.dest === "a") out.append(
-        h("p", {}, "The form writes straight into a registry store; the static site rebuilds from it."),
-        h("p", {}, h("button", { type: "button", class: "btn", disabled: !ok, onclick: (ev) => { ev.target.replaceWith(h("p", { class: "f-status ok" }, `(simulated) POST /api/records/${currentId()} → 201. Rebuild queued.`)); } }, "Sign in with institution account, then save")),
-        h("ol", {}, h("li", {}, "Needs: a server (or serverless function) + a store that commits YAML back to Git."),
-          h("li", {}, "Needs: accounts for every contributor across the consortium's institutions, and permissions."),
-          h("li", {}, "Review happens after the fact, if at all.")));
-      if (S.dest === "b") {
-        const f = files[0];
-        const prUrl = `${GH}/new/main?filename=${encodeURIComponent(f.path)}&value=${encodeURIComponent(f.text)}`;
-        const issueBody = files.map((x) => `\`${x.path}\`\n\n\`\`\`${x.path.endsWith(".yaml") ? "yaml" : "markdown"}\n${x.text}\`\`\``).join("\n\n");
-        const issueUrl = `${GH}/issues/new?labels=submission&title=${encodeURIComponent((S.editing ? "Update " : "New ") + (currentId() || "record"))}&body=${encodeURIComponent(issueBody)}`;
-        out.append(
-          h("p", {}, "The form validates here, then opens GitHub with the file filled in. A coordinator reviews and merges; the site rebuilds."),
-          h("p", {}, h("a", { class: "btn", href: ok ? issueUrl : null, target: "_blank" }, "Open a submission issue"), " ",
-            !S.editing && files.length === 1 ? h("a", { class: "btn ghost", href: ok ? prUrl : null, target: "_blank" }, "Open as a pull request") : h("span", { class: "muted" }, S.editing ? " (PR prefill only works for new files; edits go via the issue)" : " (two files: PR prefill takes one; use the issue)")),
-          h("ol", {}, h("li", {}, "Needs: a free GitHub account per contributor (no Git, no YAML, but a login)."),
-            h("li", {}, "An Action turns a 'submission' issue into a PR and re-validates it."),
-            h("li", {}, `Issue URL is ${issueUrl.length.toLocaleString()} characters; GitHub rejects URLs over ~8,000, so long prose must be pasted instead.`)));
-      }
-      if (S.dest === "c") {
-        const dl = () => files.forEach((x) => { const a = h("a", { href: URL.createObjectURL(new Blob([x.text], { type: "text/plain" })), download: x.path.split("/").pop() }); a.click(); });
-        out.append(h("p", {}, "The form produces the file(s); the contributor emails them to a coordinator who commits them."),
-          h("p", {}, h("button", { type: "button", class: "btn", onclick: dl }, `Download ${files.map((x) => x.path.split("/").pop()).join(" + ")}`), " ",
-            h("a", { class: "btn ghost", href: `mailto:${COORDINATOR}?subject=${encodeURIComponent("Registry record " + (currentId() || ""))}&body=${encodeURIComponent("Attached: " + files.map((x) => x.path).join(", "))}` }, "Email the coordinator")),
-          h("ol", {}, h("li", {}, "Needs nothing but a browser and email."), h("li", {}, "Coordinator does all the Git work; easy to lose track of attachments and versions.")));
-      }
-      box.replaceChildren(h("h2", {}, "Submit"), h("div", { class: "dest-tabs" }, tabs.map(([k, t]) =>
-        h("button", { type: "button", class: S.dest === k ? "on" : "", onclick: () => { S.dest = k; draw(); } }, t))), out);
+      const { file } = output();
+      const title = encodeURIComponent(`${S.editing ? "Update" : "New"} ${currentId()}`);
+      const newIssue = (body) => `${GH}/issues/new?template=submission.md&title=${title}&body=${encodeURIComponent(body)}`;
+      const issueUrl = newIssue(issueBody(file));
+      const prUrl = `${GH}/new/main?filename=${encodeURIComponent(file.path)}&value=${encodeURIComponent(file.text)}`;
+      const out = h("div", { class: "dest-out" },
+        h("p", {}, "Submitting opens a GitHub issue with your record filled in. A coordinator reviews it; on approval it becomes a pull request, is validated again, and the site rebuilds once merged. You need a free GitHub account, but no Git or YAML."));
+      if (!ok) out.append(h("p", { class: "f-err" }, `Fix ${S.errors.length} problem(s) before submitting.`));
+      const copyAndOpen = async () => {
+        try { await navigator.clipboard.writeText(issueBody(file)); }
+        catch (ex) { alertInline("Could not copy the record: " + ex.message); return; }
+        window.open(newIssue("Paste the copied record here (Ctrl+V), replacing this line."), "_blank");
+      };
+      out.append(h("p", {},
+        issueUrl.length <= MAX_URL
+          ? h("a", { class: "btn", href: ok ? issueUrl : null, target: "_blank" }, "Open a submission issue")
+          : h("button", { type: "button", class: "btn", disabled: !ok, onclick: copyAndOpen }, "Copy the record and open a submission issue"),
+        " ",
+        !S.editing && prUrl.length <= MAX_URL ? h("a", { class: "btn ghost", href: ok ? prUrl : null, target: "_blank" }, "Or open a pull request directly") : null));
+      if (issueUrl.length > MAX_URL) out.append(h("p", { class: "muted" }, "This record is too long to prefill in a link, so it is copied to your clipboard: paste it into the issue that opens."));
+      box.replaceChildren(h("h2", {}, "Submit"), out);
     };
     box.redraw = draw;
     draw();
     return box;
   }
 
-  function layoutA() {
-    const nav = h("nav", {}, SECTIONS.map(([k, t]) => h("a", { href: "#sec-" + k }, t, " ", h("span", { class: "cnt f-cnt", "data-sec": k }))),
-      h("a", { href: "#dest" }, "Submit"));
-    const main = h("div", {}, SECTIONS.map(([k]) => section(k)),
-      h("details", {}, h("summary", {}, "Preview the YAML"), h("pre", { class: "f-yaml" })), h("div", { id: "dest" }, destPanel()));
-    return h("div", { class: "fA" }, nav, main);
-  }
-  function layoutB() {
+  function wizard() {
     const steps = [...SECTIONS.map(([k, t]) => [k, t]), ["review", "Review & submit"]];
     const cur = steps[S.step];
     const bar = h("div", { class: "steps" }, steps.map(([k, t], i) =>
@@ -397,44 +376,23 @@
     const nav = h("div", { class: "navbtns" },
       h("button", { type: "button", class: "btn ghost", disabled: S.step === 0, onclick: () => { S.step--; render(); } }, "← Back"),
       S.step < steps.length - 1 ? h("button", { type: "button", class: "btn", onclick: () => { S.step++; render(); } }, "Next →") : h("span"));
-    return h("div", { class: "fB" }, bar, body, nav);
-  }
-  function layoutC() {
-    const left = h("div", {}, SECTIONS.map(([k, t], i) => {
-      const s = section(k); s.querySelector("h2").remove();
-      return h("details", { open: i === 0 }, h("summary", {}, t, " ", h("span", { class: "cnt f-cnt", "data-sec": k })), s);
-    }));
-    let timer;
-    const ta = h("textarea", { class: "yaml-edit", spellcheck: "false", oninput: (ev) => {
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-        try { S.rec = jsyaml.load(ev.target.value) || {}; delete S.rec.id; render(true); }
-        catch (ex) { root.querySelector(".errs").textContent = "YAML: " + ex.message; }
-      }, 400);
-    } });
-    const right = h("div", { class: "right" }, h("h3", {}, "Record YAML (editable: paste or type, the form follows)"), ta, h("div", { class: "errs" }), destPanel());
-    return h("div", { class: "fC" }, left, right);
+    return h("div", { class: "wizard" }, bar, body, nav);
   }
 
-  function render(keepYamlEditor) {
-    root = layoutRoot();
-    if (!root) return;
-    const layout = root.dataset.layout;
+  function render() {
+    root = document.querySelector(".submit-root");
     const scroll = window.scrollY;
-    const old = keepYamlEditor && root.querySelector("textarea.yaml-edit");
-    document.querySelectorAll(".submit-root").forEach((r) => r.replaceChildren());
     const tasks = h("datalist", { id: "f-tasks" }, Object.entries(REG.tasks).map(([t, n]) => h("option", { value: t }, n)));
-    root.append(topBar(), tasks, { A: layoutA, B: layoutB, C: layoutC }[layout]());
-    if (old) root.querySelector("textarea.yaml-edit").replaceWith(old);
-    changed(false, !!old);
+    root.replaceChildren(topBar(), tasks, wizard());
+    changed();
     window.scrollTo(0, scroll);
   }
 
   // after every edit: re-validate, mark fields, refresh previews
-  function changed(idMayChange, skipYamlEditor) {
+  function changed(idMayChange) {
     if (!root) return;
     validate();
-    const { yaml, files } = output();
+    const { file } = output();
     root.querySelectorAll(".f-bad").forEach((el) => el.classList.remove("f-bad"));
     root.querySelectorAll(".f-err").forEach((el) => (el.textContent = ""));
     const perSec = {};
@@ -447,18 +405,12 @@
     }
     root.querySelectorAll(".f-cnt").forEach((el) => (el.textContent = perSec[el.dataset.sec] ? `(${perSec[el.dataset.sec]})` : ""));
     root.querySelectorAll(".f-stepbtn").forEach((el) => el.classList.toggle("err", !!perSec[el.dataset.sec]));
-    root.querySelectorAll("pre.f-yaml").forEach((el) => (el.textContent = files.map((f) => `# ${f.path}\n${f.text}`).join("\n")));
-    const ta = root.querySelector("textarea.yaml-edit");
-    if (ta && !skipYamlEditor && document.activeElement !== ta) ta.value = yaml;
-    const errs = root.querySelector(".errs");
-    if (errs) errs.textContent = S.errors.map((e) => `${e.path || "/"}: ${e.msg}`).join("\n") || "";
-    if (errs) errs.style.whiteSpace = "pre-wrap";
+    root.querySelectorAll("pre.f-yaml").forEach((el) => (el.textContent = `# ${file.path}\n${file.text}`));
     const st = root.querySelector(".f-status");
     if (st) { st.textContent = S.errors.length ? `${S.errors.length} problem(s)` : "✓ valid against FDIS Registry Profile v0.1"; st.className = "f-status " + (S.errors.length ? "bad" : "ok"); }
-    if (idMayChange) { const idEl = root.querySelector(".f-id"); if (idEl) idEl.value = currentId(); root.querySelector(".f-top b").textContent = S.editing ? `Editing ${S.editing}` : `New Research Project ${currentId() ? "→ " + currentId() : ""}`; }
+    if (idMayChange) { const idEl = root.querySelector(".f-id"); if (idEl) idEl.value = currentId(); root.querySelector(".f-top b").textContent = heading(); }
     root.querySelectorAll(".dest").forEach((d) => d.redraw && !d.contains(document.activeElement) && d.redraw());
   }
 
-  document.addEventListener("variantchange", () => render());
   render();
 })();

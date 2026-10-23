@@ -1,0 +1,40 @@
+# Turn an approved 'submission' issue from the site's form into a pull request.
+# A coordinator reviews the issue, then adds the 'approved' label (only people
+# with triage access can label). The record files are written, validated, and
+# proposed as a PR that closes the issue.
+name: submission
+on:
+  issues:
+    types: [labeled]
+jobs:
+  propose:
+    if: github.event.label.name == 'approved' && contains(github.event.issue.labels.*.name, 'submission')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Write the record files from the issue
+        env:  # untrusted: only ever passed as data
+          BODY: ${{ github.event.issue.body }}
+          TITLE: ${{ github.event.issue.title }}
+        run: |
+          printf '%s' "$BODY" > "$RUNNER_TEMP/issue.md"
+          new=; [[ "$TITLE" == New\ * ]] && new=--new
+          python3 scripts/submission.py $new "$RUNNER_TEMP/issue.md"
+      - name: Validate
+        run: scripts/check.sh
+      - uses: peter-evans/create-pull-request@v7
+        with:
+          branch: submission/issue-${{ github.event.issue.number }}
+          title: ${{ github.event.issue.title }}
+          body: "From the submission form. Closes #${{ github.event.issue.number }}."
+          commit-message: "${{ github.event.issue.title }} (submission #${{ github.event.issue.number }})"
+      - name: Report a failure on the issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh issue comment ${{ github.event.issue.number }} --repo "$GITHUB_REPOSITORY" --body "The submission could not be turned into a pull request; see ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Fix the record in the form and submit again, or edit this issue and re-add the 'approved' label."

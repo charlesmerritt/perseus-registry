@@ -4,9 +4,7 @@
 """Static wiki generator for the Perseus Research Registry.
 
 Builds the site from records/: directory, by-Objective outline, record pages,
-People, Mentions, and a schema-driven submission form (submit.html). Until the
-form layout is chosen (issue 0008), submit.html carries three layouts
-switchable with ?variant=A|B|C.
+People, Mentions, and a schema-driven submission form (submit.html).
 
     uv run site/build.py           build into site/_site/
     uv run site/build.py --serve   build, then serve on :8000
@@ -16,10 +14,11 @@ import html, json, re, shutil, sys, urllib.request
 from pathlib import Path
 
 import markdown
-import yaml
 
 HERE = Path(__file__).parent
 REPO = HERE.parent
+sys.path.insert(0, str(REPO / "scripts"))
+from record_file import read_record  # noqa: E402
 OUT = HERE / "_site"
 SNAPSHOT = HERE / "stac-snapshot.json"
 STAC = "https://stac.d2s.org/api/v1/collections/"
@@ -35,14 +34,12 @@ e = html.escape
 # ---------------------------------------------------------------- loading
 
 def load_records():
-    """A record is X.yaml; its prose, if any, is the sidecar X.md (issue 0007)."""
+    """A record is X.yaml, or X.md with YAML frontmatter and its prose as the body (issue 0008)."""
     recs = {t: {} for t in TYPES}
     for t in TYPES:
-        for f in sorted((REPO / "records" / t).glob("*.yaml")):
-            rec = yaml.safe_load(f.read_text())
-            side = f.with_suffix(".md")
-            rec["_body"] = side.read_text() if side.exists() else ""
-            rec["_file"], rec["_prose_file"] = str(f.relative_to(REPO)), str(side.relative_to(REPO))
+        for f in sorted((REPO / "records" / t).glob("*.yaml")) + sorted((REPO / "records" / t).glob("*.md")):
+            rec, rec["_body"] = read_record(f)
+            rec["_file"] = str(f.relative_to(REPO))
             recs[t][rec["id"]] = rec
     return recs
 
@@ -262,12 +259,6 @@ def page(title, body, active="", head=""):
 <script src="site.js"></script></body></html>"""
 
 
-def variants(vs):
-    """Alternative layouts of one page, flipped by switcher.js (form only, until issue 0008)."""
-    return "\n".join(f'<section class="variant v{k}" data-variant="{k}" data-name="{e(n)}">{body}</section>'
-                     for k, n, body in vs)
-
-
 # ---------------------------------------------------------------- project page
 
 def project_blocks(recs, p):
@@ -297,7 +288,7 @@ def project_blocks(recs, p):
         f'<tr><th>{k} {OBJECTIVES[k]}</th><td>{level_chip(oi[k]) if k in oi else ("<i class=muted>own Objective</i>" if k == o else "<i class=muted>not stated</i>")}</td><td class="note">{e((oi.get(k) or {}).get("note") or "")}</td></tr>'
         for k in OBJECTIVES)
     b["prose"] = prose_sections(p["_body"])
-    b["file"] = f'<p class="filenote">Source: <code>{e(p["_file"])}</code> · prose: <code>{e(p["_prose_file"])}</code>{"" if p["_body"] else " (none yet)"}</p>'
+    b["file"] = f'<p class="filenote">Source: <code>{e(p["_file"])}</code>{"" if p["_body"] else " (no prose yet)"}</p>'
     return b
 
 
@@ -441,7 +432,7 @@ Each is a candidate for a new record.</p><table class="dir"><tr><th>Mentioned as
 
 def submit_page(recs):
     reg = {
-        "projects": {k: {"title": v["title"], "file": v["_file"], "record": clean(v), "body": v["_body"]} for k, v in recs["research-project"].items()},
+        "projects": {k: {"title": v["title"], "record": clean(v), "body": v["_body"]} for k, v in recs["research-project"].items()},
         "datasets": {k: title_of(recs, "dataset", k) for k in recs["dataset"]},
         "software": {k: v["title"] for k, v in recs["software"].items()},
         "institutions": {k: v["name"] for k, v in recs["institution"].items()},
@@ -452,13 +443,8 @@ def submit_page(recs):
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ajv/8.17.1/ajv2019.bundle.min.js"></script>
 <script>window.REGISTRY = {json.dumps(reg)};
 window.SCHEMA = {(REPO / "schema/generated/fdis_registry.schema.json").read_text()};</script>
-<script src="switcher.js" defer></script>
 <script src="form.js" defer></script>"""
-    mk = lambda k: f'<div class="submit-root" data-layout="{k}"></div>'
-    body = variants([("A", "Long form + section nav", mk("A")), ("B", "Step-by-step wizard", mk("B")),
-                     ("C", "Split: form + live YAML", mk("C"))])
-    return page("Submit or update a record", '<p class="draft-note">Form layout still being chosen (issue 0008): use ← → to compare.</p>' + body,
-                "submit.html", head)
+    return page("Submit or update a record", '<div class="submit-root"></div>', "submit.html", head)
 
 
 def clean(r):
@@ -476,7 +462,7 @@ def main():
     if OUT.exists():
         shutil.rmtree(OUT)
     OUT.mkdir()
-    for f in ("style.css", "site.js", "switcher.js", "form.js"):
+    for f in ("style.css", "site.js", "form.js"):
         shutil.copy(HERE / "assets" / f, OUT / f)
     shutil.copy(REPO / "schema/generated/fdis_registry.schema.json", OUT / "fdis_registry.schema.json")
     P = sorted(recs["research-project"].values(), key=lambda p: p["id"])

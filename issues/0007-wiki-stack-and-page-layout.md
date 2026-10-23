@@ -24,7 +24,8 @@ Decided by the user, 2026-10-23, after reviewing the prototype:
 - **Generator**: a small Python generator (`site/build.py`), not MkDocs Material. It is plain Python string templates over `records/`, and the schema-driven form is one more generated page with its own script, so embedding forms costs nothing extra.
 - **Directory**: the sortable, filterable table is the index (`index.html`). The outline by Objective, then Task, is kept as a second view (`objectives.html`), linked from the nav. The connection matrix is dropped.
 - **Research Project page**: wiki article plus infobox. Prose sections run down the page, structured facts sit in the infobox, then the Datasets table and the generated "What links here". The dashboard and long-read layouts are dropped.
-- **Where prose lives**: a sidecar `<id>.md` next to `<id>.yaml`. The YAML stays plain for the schema validator and the form. Frontmatter-in-one-`.md` support is removed from the loader.
+- **Where prose lives** (superseded, see below): a sidecar `<id>.md` next to `<id>.yaml`. The YAML stays plain for the schema validator and the form. Frontmatter-in-one-`.md` support is removed from the loader.
 
-Implemented in `site/`. Only `submit.html` still carries layout variants, pending issue 0008.
+Implemented in `site/`. `submit.html` kept its layout variants until issue 0008 chose one.
 
+**Amended by issue 0008** (user decision, 2026-10-23): prose now lives in one `<id>.md` with the record as YAML frontmatter, not in a sidecar. The submit page is a single step wizard.

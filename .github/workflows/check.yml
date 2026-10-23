@@ -1,0 +1,11 @@
+# Validate the schema, every record, and the scripts' tests on every push and pull request.
+name: check
+on: [push, pull_request]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: scripts/check.sh
+      - run: uv run --no-project --with pytest==8.3.4 --with pyyaml==6.0.2 --with jsonschema==4.23.0 pytest -q tests

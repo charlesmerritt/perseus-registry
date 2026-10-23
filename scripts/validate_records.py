@@ -1,7 +1,8 @@
-"""Validate Registry Record YAML files against the generated JSON Schema.
+"""Validate Registry Record files against the generated JSON Schema.
 
-The record class comes from the file's parent directory name
-(research-project/RP-06.yaml -> ResearchProject). Each file is validated
+A record file is <id>.yaml, or <id>.md with the record as YAML frontmatter
+and its prose as the Markdown body. The record class comes from the file's
+parent directory name (research-project/RP-06.md -> ResearchProject). Each file is validated
 against that class's definition in schema/generated/fdis_registry.schema.json,
 and its `id` must match the file name.
 
@@ -13,7 +14,8 @@ import sys
 from pathlib import Path
 
 import jsonschema
-import yaml
+
+from record_file import read_record
 
 CLASS_BY_DIR = {
     "research-project": "ResearchProject",
@@ -27,9 +29,11 @@ CLASS_BY_DIR = {
 def main(schema_path: str, *dirs: str) -> int:
     schema = json.loads(Path(schema_path).read_text())
     failures = 0
-    files = sorted(f for d in dirs for f in Path(d).rglob("*.y*ml"))
+    files = sorted(
+        f for d in dirs for f in Path(d).rglob("*") if f.suffix in (".yaml", ".yml", ".md") and f.name != "README.md"
+    )
     if not files:
-        print(f"no YAML files found in {', '.join(dirs)}")
+        print(f"no record files found in {', '.join(dirs)}")
         return 1
     for path in files:
         cls = CLASS_BY_DIR.get(path.parent.name)
@@ -39,7 +43,12 @@ def main(schema_path: str, *dirs: str) -> int:
             continue
         # Validate the JSON form of the record (YAML int keys become strings,
         # dates become ISO strings), which is what forms and JSON-LD see.
-        record = json.loads(json.dumps(yaml.safe_load(path.read_text()), default=str))
+        try:
+            record = json.loads(json.dumps(read_record(path)[0], default=str))
+        except ValueError as ex:
+            failures += 1
+            print(f"FAIL {path}: {ex}")
+            continue
         validator = jsonschema.Draft201909Validator(
             {"$ref": f"#/$defs/{cls}", "$defs": schema["$defs"]}
         )

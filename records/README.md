@@ -2,8 +2,8 @@
 
 The registry's records, seeded once from `sources/objective2-tracker.csv` (see `issues/0010-seed-objective-2-records.md`). The tracker is not consulted again; these files are now the source.
 
-- `<type>/<id>.yaml` is one record. The directory gives its type and the file name its `id`, as in `examples/`.
-- `research-project/<id>.md` holds the record's prose sections (Overview, Needs from other Objectives, Integration notes), which are not schema fields.
+- One file is one record. The directory gives its type and the file name its `id`, as in `examples/`.
+- `<id>.yaml` holds only the record's fields. `<id>.md` holds the fields as YAML frontmatter between `---` lines, then the record's prose sections (Overview, Needs from other Objectives, Integration notes), which are not schema fields. Research Projects use `.md` (issue 0008).
 
 Seeding conventions:
 

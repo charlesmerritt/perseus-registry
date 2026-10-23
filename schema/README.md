@@ -31,11 +31,17 @@ scripts/check.sh
 
 This fails if `generated/` differs from what the schema produces, then validates every file under `examples/` and `records/`.
 
-A record file holds one record, and its type comes from its directory: `research-project/`, `software/`, `dataset/`, `institution/` or `publication/`. The validator checks each file against that class's definition (`$defs/<Class>`) in the single generated JSON Schema. It also checks that the record's `id` matches the file name. To validate other records:
+A record file holds one record: `<id>.yaml`, or `<id>.md` with the record as YAML frontmatter and prose as the Markdown body. Its type comes from its directory: `research-project/`, `software/`, `dataset/`, `institution/` or `publication/`. The validator checks each file against that class's definition (`$defs/<Class>`) in the single generated JSON Schema. It also checks that the record's `id` matches the file name. To validate other records:
 
 ```sh
 uv run --no-project --with jsonschema --with pyyaml \
   python scripts/validate_records.py schema/generated/fdis_registry.schema.json path/to/records
+```
+
+The record reader, the validator and the submission-issue parser have tests:
+
+```sh
+uv run --no-project --with pytest --with pyyaml --with jsonschema pytest tests
 ```
 
 ## What the JSON Schema does not enforce

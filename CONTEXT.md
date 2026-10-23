@@ -55,7 +55,7 @@ An organization or team participating in the consortium.
 A citable output: paper, report, documentation, or release, usually with a DOI.
 
 **Registry Record**:
-One entity of the above types, conforming to the official schema and stored as YAML (contributors normally create it through a form), identified by a persistent ID that never changes when titles, leads, or Objectives change: a neutral running number (`RP-06`) for Research Projects, which encodes no Objective or Task so it can never contradict the primary Task, a short slug (`treemap`, `landis-ii`) for other types.
+One entity of the above types, conforming to the official schema and stored as YAML: a `.yaml` file, or for a record with prose (a Research Project) a Markdown file with the YAML as frontmatter (contributors normally create it through a form), identified by a persistent ID that never changes when titles, leads, or Objectives change: a neutral running number (`RP-06`) for Research Projects, which encodes no Objective or Task so it can never contradict the primary Task, a short slug (`treemap`, `landis-ii`) for other types.
 
 ## Relationships
 
