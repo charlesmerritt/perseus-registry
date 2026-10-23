@@ -1,4 +1,4 @@
-id: O2-08
+id: RP-08
 tracker_id: O2-08
 title: UGA Timber Supply Model and Results Website
 summary: >-
@@ -31,11 +31,11 @@ outputs:
       name: Timber supply, price and forest-structure projections
     via:
       name: UGA Timber Supply Model
-    note: Used by O2-11 and O2-15.
+    note: Used by RP-11 and RP-15.
 depends_on:
-  - project: O2-04
+  - project: RP-04
     note: Market and policy scenarios.
-  - project: O2-11
+  - project: RP-11
     unconfirmed: true
     note: Transportation and value-chain outputs, potentially.
 objective_integration:

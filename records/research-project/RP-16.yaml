@@ -1,4 +1,4 @@
-id: O2-16
+id: RP-16
 tracker_id: O2-16
 title: Objective 1 Data, STAC, and Cloud Platform Integration
 summary: >-
@@ -67,7 +67,7 @@ inputs:
   - dataset:
       name: Objective 1 imagery and forest-structure products
 depends_on:
-  - project: O2-17
+  - project: RP-17
     note: Canopy-height and biomass products.
 related_to:
   - project:

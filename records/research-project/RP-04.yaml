@@ -1,4 +1,4 @@
-id: O2-04
+id: RP-04
 tracker_id: O2-04
 title: Survey-to-Scenario Integration
 summary: >-
@@ -53,7 +53,7 @@ outputs:
   - dataset:
       name: Objective 2 scenario assumptions and parameters
     note: >-
-      Used by O2-01, O2-02, O2-05 to O2-08 and O2-10 to O2-12.
+      Used by RP-01, RP-02, RP-05 to RP-08 and RP-10 to RP-12.
 related_to:
   - project:
       name: Objective 3 scenario framework

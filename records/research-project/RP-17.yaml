@@ -1,4 +1,4 @@
-id: O2-17
+id: RP-17
 tracker_id: O2-17
 title: Canopy Height / Biomass Scaling for Decision Support
 summary: >-
@@ -45,12 +45,12 @@ inputs:
 outputs:
   - dataset:
       name: Canopy-height and biomass products
-    note: Not in D2S STAC yet. Used by O2-16 and downstream model and visualization workflows.
+    note: Not in D2S STAC yet. Used by RP-16 and downstream model and visualization workflows.
 related_to:
-  - project: O2-16
+  - project: RP-16
     unconfirmed: true
     note: >-
-      Proposed: merge the Objective 2 component into O2-16 and track the
+      Proposed: merge the Objective 2 component into RP-16 and track the
       underlying canopy-height research under Objective 1.
 objective_integration:
   "2":

@@ -1,7 +1,7 @@
 """Validate Registry Record YAML files against the generated JSON Schema.
 
 The record class comes from the file's parent directory name
-(research-project/O2-06.yaml -> ResearchProject). Each file is validated
+(research-project/RP-06.yaml -> ResearchProject). Each file is validated
 against that class's definition in schema/generated/fdis_registry.schema.json,
 and its `id` must match the file name.
 

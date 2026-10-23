@@ -1,9 +1,9 @@
-id: O2-02
+id: RP-02
 tracker_id: O2-02
 title: Potential Landowner Optimization Model
 summary: >-
   A possible UGA landowner-management optimization model, in development.
-  Its scope, structure and relationship to the Harvest Choice Model (O2-01)
+  Its scope, structure and relationship to the Harvest Choice Model (RP-01)
   are not yet defined.
 status: active
 phase: concept
@@ -37,17 +37,17 @@ outputs:
     via:
       name: UGA landowner optimization model
       unconfirmed: true
-    note: Potential input to O2-15.
+    note: Potential input to RP-15.
 depends_on:
-  - project: O2-03
+  - project: RP-03
     note: Parcel and TreeMap integration.
-  - project: O2-04
+  - project: RP-04
     note: Scenarios.
 related_to:
-  - project: O2-01
+  - project: RP-01
     unconfirmed: true
     note: Relationship to the Harvest Choice Model still needs definition; possible comparison.
-  - project: O2-12
+  - project: RP-12
     unconfirmed: true
     note: Possible collaboration to look into.
 objective_integration:

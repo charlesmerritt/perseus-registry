@@ -1,9 +1,9 @@
-# Research Project O2-06, seeded from sources/objective2-tracker.csv.
+# Research Project RP-06 (tracker row O2-06), seeded from sources/objective2-tracker.csv.
 # Where the tracker hedges or does not say, facts are marked unconfirmed or
 # entered as Mentions. Prose sections (Overview, Goals and milestones, Needs
 # from other Objectives, Integration notes, Methods) belong in the Markdown
 # body, not here.
-id: O2-06
+id: RP-06
 tracker_id: O2-06
 title: LANDIS-II Expansion to the South (UGA) and Central (IN) Hardwoods
 summary: >-
@@ -77,13 +77,13 @@ outputs:
   - dataset:
       name: LANDIS-II South and Central Hardwoods regional simulation outputs
     via: landis-ii
-    note: Used by O2-15; potential input to broader model comparisons.
+    note: Used by RP-15; potential input to broader model comparisons.
 depends_on:
-  - project: O2-03
+  - project: RP-03
     note: Spatial and ownership inputs.
-  - project: O2-04
+  - project: RP-04
     note: Scenarios.
-  - project: O2-16
+  - project: RP-16
     note: Wall-to-wall data products.
 related_to:
   - project:

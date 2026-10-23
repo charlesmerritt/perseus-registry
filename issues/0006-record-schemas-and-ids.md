@@ -17,6 +17,8 @@ The draft **FDIS Registry Profile v0.1**.
 
 ### Identifiers
 
+> **Amended 2026-10-23 (user decision during the wiki prototype):** Research Project IDs are now **neutral**, `RP-{nn}` (e.g. `RP-06`), a consortium-wide running number that encodes no Objective. The Objective-prefixed scheme below contradicted the primary Task once a project moved (O2-17 has Task 1.3) and read as a Task number. Existing numbers carried over (O2-06 → RP-06; 09, 13, 14 stay retired), and the old ID stays in `tracker_id`. The rest of this section stands.
+
 - **Research Projects** use tracker-style IDs `O{objective}-{nn}` (e.g. `O2-06`), numbered in sequence within each Objective and assigned by the form when a record is created. **An ID never changes**, and numbers are never reused (O2-09, O2-13, O2-14 stay retired). If a project moves Objective it keeps its ID; `primary_task` says where it belongs now. The prefix records where the project started.
 - **Software, Datasets, Institutions, Publications** use short readable slugs (`landis-ii`, `treemap`, `uga`, `daigneault-2026-scenarios`). Every reference names its type (`dataset: treemap`, `via: landis-ii`), so slugs never collide across types. Institutions also carry their ROR ID.
 - In JSON-LD exports, IDs expand under a Perseus base URL.

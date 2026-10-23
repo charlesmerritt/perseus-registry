@@ -1,4 +1,4 @@
-id: O2-10
+id: RP-10
 tracker_id: O2-10
 title: Forest Health Assessment from Ground and Aerial Data
 summary: >-
@@ -51,11 +51,11 @@ inputs:
 outputs:
   - dataset:
       name: Forest-health and risk information
-    note: For regional models and O2-15; exact downstream users to confirm.
+    note: For regional models and RP-15; exact downstream users to confirm.
 depends_on:
-  - project: O2-04
+  - project: RP-04
     note: Pest and disturbance scenario assumptions.
-  - project: O2-16
+  - project: RP-16
     note: Remote-sensing data products.
 objective_integration:
   "1":

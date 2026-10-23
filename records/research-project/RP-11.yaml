@@ -1,4 +1,4 @@
-id: O2-11
+id: RP-11
 tracker_id: O2-11
 title: Forest Products Transportation Cost and Supply-Chain Optimization
 summary: >-
@@ -37,11 +37,11 @@ inputs:
 outputs:
   - dataset:
       name: Transportation and value-chain cost estimates
-    note: For O2-15 and potentially O2-08.
+    note: For RP-15 and potentially RP-08.
 depends_on:
-  - project: O2-04
+  - project: RP-04
     note: Market and policy scenario assumptions.
-  - project: O2-08
+  - project: RP-08
     note: Timber-supply projections.
 objective_integration:
   "1":

@@ -1,4 +1,4 @@
-id: O2-15
+id: RP-15
 tracker_id: O2-15
 title: Multimodel and Scenario Visualization
 summary: >-
@@ -58,18 +58,18 @@ outputs:
       name: Integrated decision-support views
     note: For Objective 3 and broader Perseus users.
 depends_on:
-  - project: O2-01
-  - project: O2-02
+  - project: RP-01
+  - project: RP-02
     unconfirmed: true
     note: Potential management optimization outputs.
-  - project: O2-05
-  - project: O2-06
-  - project: O2-07
-  - project: O2-08
-  - project: O2-10
-  - project: O2-11
-  - project: O2-12
-  - project: O2-16
+  - project: RP-05
+  - project: RP-06
+  - project: RP-07
+  - project: RP-08
+  - project: RP-10
+  - project: RP-11
+  - project: RP-12
+  - project: RP-16
     note: Platform and data infrastructure.
 objective_integration:
   "1":

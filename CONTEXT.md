@@ -55,7 +55,7 @@ An organization or team participating in the consortium.
 A citable output: paper, report, documentation, or release, usually with a DOI.
 
 **Registry Record**:
-One entity of the above types, conforming to the official schema and stored as YAML (contributors normally create it through a form), identified by a persistent ID that never changes when titles, leads, or Objectives change: `O2-06` style for Research Projects, a short slug (`treemap`, `landis-ii`) for other types.
+One entity of the above types, conforming to the official schema and stored as YAML (contributors normally create it through a form), identified by a persistent ID that never changes when titles, leads, or Objectives change: a neutral running number (`RP-06`) for Research Projects, which encodes no Objective or Task so it can never contradict the primary Task, a short slug (`treemap`, `landis-ii`) for other types.
 
 ## Relationships
 
@@ -66,6 +66,8 @@ One entity of the above types, conforming to the official schema and stored as Y
 - A **Publication** is associated with **Research Projects** and **Datasets**
 
 ## Flagged ambiguities
+
+- Tracker IDs like `O2-06` read as if they carried the Objective (and were easily mistaken for Task numbers like `2.2`), and went stale when a project moved Objective (O2-17 is Task 1.3). Resolved: Research Project IDs are neutral (`RP-06`); the tracker ID survives as `tracker_id`.
 
 - "Project" was used for both the consortium's work packages and D2S's area-plus-imagery concept. Resolved: **Research Project** vs **D2S Project**.
 - "Model or tool" resolved into a single **Software** type with a `kind`.

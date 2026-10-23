@@ -41,9 +41,10 @@ types:
   ProjectId:
     typeof: string
     description: >-
-      Research Project ID, O{objective}-{nn} (e.g. O2-06). Assigned once,
-      never changed, never reused.
-    pattern: "^O[1-4]-\\d{2}$"
+      Research Project ID, RP-{nn} (e.g. RP-06): a consortium-wide running
+      number that encodes nothing, so it never contradicts the primary Task.
+      Assigned once, never changed, never reused.
+    pattern: "^RP-\\d{2,}$"
   Slug:
     typeof: string
     description: >-
@@ -262,7 +263,7 @@ slots:
   # --- Research Project ----------------------------------------------------
   tracker_id:
     slot_uri: perseus:trackerId
-    description: The row ID in a legacy tracker spreadsheet, when it differs from id.
+    description: The row ID in a legacy tracker spreadsheet (e.g. O2-06), when it differs from id.
   status:
     slot_uri: perseus:status
     range: ProjectStatus
@@ -710,7 +711,7 @@ classes:
     slot_usage:
       id:
         range: ProjectId
-        description: Research Project ID, e.g. O2-06.
+        description: Research Project ID, e.g. RP-06.
       title:
         required: true
       summary:

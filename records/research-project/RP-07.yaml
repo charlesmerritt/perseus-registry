@@ -1,4 +1,4 @@
-id: O2-07
+id: RP-07
 tracker_id: O2-07
 title: Maine Multimodel Comparison and Simulation Ensemble
 summary: >-
@@ -41,17 +41,17 @@ inputs:
 outputs:
   - dataset:
       name: Maine multimodel comparison outputs
-    note: Comparable model outputs for O2-15 and scenario interpretation.
+    note: Comparable model outputs for RP-15 and scenario interpretation.
 depends_on:
-  - project: O2-01
+  - project: RP-01
     note: Harvest Choice Model.
-  - project: O2-04
+  - project: RP-04
     note: Scenario assumptions.
-  - project: O2-05
+  - project: RP-05
     note: Model outputs for comparison.
 related_to:
-  - project: O2-15
-    note: Its dashboard may be tracked under O2-15.
+  - project: RP-15
+    note: Its dashboard may be tracked under RP-15.
     unconfirmed: true
 objective_integration:
   "1":

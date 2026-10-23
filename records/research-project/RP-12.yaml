@@ -1,4 +1,4 @@
-id: O2-12
+id: RP-12
 tracker_id: O2-12
 title: Tree Planning LLM and Natural-Language Scenario Interface
 summary: >-
@@ -25,9 +25,9 @@ outputs:
       name: Natural-language planning and scenario interface outputs
     note: Potential outputs to visualization and decision support.
 depends_on:
-  - project: O2-04
+  - project: RP-04
     note: Scenario assumptions.
-  - project: O2-16
+  - project: RP-16
     note: Urban and forest data.
 objective_integration:
   "1":

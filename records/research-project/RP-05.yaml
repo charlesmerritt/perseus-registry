@@ -1,4 +1,4 @@
-id: O2-05
+id: RP-05
 tracker_id: O2-05
 title: Maine Integrated Forest Sector Model (MIFSM) Expansion
 summary: >-
@@ -34,9 +34,9 @@ outputs:
       name: MIFSM scenario outputs and habitat indicators
     via:
       name: Maine Integrated Forest Sector Model (MIFSM)
-    note: Used by O2-07 and O2-15.
+    note: Used by RP-07 and RP-15.
 depends_on:
-  - project: O2-04
+  - project: RP-04
     note: Scenarios.
 objective_integration:
   "1":

@@ -1,4 +1,4 @@
-id: O2-03
+id: RP-03
 tracker_id: O2-03
 title: TreeMap, Parcel, and Landowner Data Integration
 summary: >-
@@ -30,9 +30,9 @@ inputs:
 outputs:
   - dataset:
       name: TreeMap landowner-unit and spatial layers
-    note: Inputs for O2-02 and potentially O2-06.
+    note: Inputs for RP-02 and potentially RP-06.
 depends_on:
-  - project: O2-16
+  - project: RP-16
     note: Data and platform integration; the TreeMap data are on D2S.
 objective_integration:
   "1":

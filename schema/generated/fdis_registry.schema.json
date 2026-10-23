@@ -55,7 +55,7 @@
                 "project": {
                     "anyOf": [
                         {
-                            "pattern": "^O[1-4]-\\d{2}$",
+                            "pattern": "^RP-\\d{2,}$",
                             "type": "string"
                         },
                         {
@@ -646,7 +646,7 @@
                 "project": {
                     "anyOf": [
                         {
-                            "pattern": "^O[1-4]-\\d{2}$",
+                            "pattern": "^RP-\\d{2,}$",
                             "type": "string"
                         },
                         {
@@ -828,8 +828,8 @@
                     ]
                 },
                 "id": {
-                    "description": "Research Project ID, e.g. O2-06.",
-                    "pattern": "^O[1-4]-\\d{2}$",
+                    "description": "Research Project ID, e.g. RP-06.",
+                    "pattern": "^RP-\\d{2,}$",
                     "type": "string"
                 },
                 "inputs": {
@@ -969,7 +969,7 @@
                     "type": "string"
                 },
                 "tracker_id": {
-                    "description": "The row ID in a legacy tracker spreadsheet, when it differs from id.",
+                    "description": "The row ID in a legacy tracker spreadsheet (e.g. O2-06), when it differs from id.",
                     "type": [
                         "string",
                         "null"
