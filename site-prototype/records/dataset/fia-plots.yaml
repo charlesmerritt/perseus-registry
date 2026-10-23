@@ -1,0 +1,10 @@
+# PROTOTYPE record. An external Dataset: title and summary are required.
+id: fia-plots
+title: FIA plot data (FIA DataMart)
+summary: >-
+  USDA Forest Service Forest Inventory and Analysis plot, tree, and
+  condition tables, including repeated measurements.
+source:
+  url: https://research.fs.usda.gov/programs/fia
+access: public
+availability: published

@@ -1,0 +1,31 @@
+# PROTOTYPE record, roughly drafted from the tracker for the site prototype.
+id: O2-02
+tracker_id: O2-02
+title: Potential Landowner Optimization Model
+summary: Possible UGA landowner-management optimization model. Its scope, structure,
+  and relationship to the Harvest Choice Model are not defined
+status: active
+phase: concept
+primary_task:
+  task: '2.1'
+supporting_tasks:
+- task: '2.2'
+leads:
+- name: Bahaa Alaila
+  institution: uga
+  unconfirmed: true
+- name: Shishir Lohar
+  institution: uga
+  unconfirmed: true
+lead_institution:
+  institution: uga
+depends_on:
+- project: O2-03
+- project: O2-04
+objective_integration:
+  '1':
+    level: discuss
+  '3':
+    level: discuss
+  '4':
+    level: n/a

@@ -1,0 +1,31 @@
+# PROTOTYPE record, roughly drafted from the tracker for the site prototype.
+id: O2-07
+tracker_id: O2-07
+title: Maine Multimodel Comparison and Simulation Ensemble
+summary: Harmonizes and compares initial conditions, assumptions, calibration, and
+  outputs across FVS, LANDIS-II, Woodstock Optimization Studio, and the Harvest
+  Choice Model using FIA data.
+status: active
+phase: validation
+primary_task:
+  task: '2.2'
+supporting_tasks:
+- task: '2.1'
+- task: '2.4'
+leads:
+- name: Adam Daigneault
+  institution: umaine
+  unconfirmed: true
+lead_institution:
+  institution: umaine
+inputs:
+- dataset: fia-plots
+  via: landis-ii
+  note: Standardized FIA inputs.
+objective_integration:
+  '1':
+    level: informational
+  '3':
+    level: collaborative
+  '4':
+    level: n/a

@@ -1,0 +1,32 @@
+# PROTOTYPE record, roughly drafted from the tracker for the site prototype.
+id: O2-01
+tracker_id: O2-01
+title: Harvest Choice Model and Landowner Decision Modeling
+summary: Uses FIA, ownership, stand, spatial, and economic variables in a multinomial-logit
+  framework to estimate landowner harvest and management choices under alternative
+  policy and market conditions.
+status: active
+phase: integration
+primary_task:
+  task: '2.1'
+supporting_tasks:
+- task: '2.2'
+- task: '2.3'
+leads:
+- name: Jianheng Zhao
+  institution: umaine
+  unconfirmed: true
+- name: Adam Daigneault
+  institution: umaine
+  unconfirmed: true
+lead_institution:
+  institution: umaine
+depends_on:
+- project: O2-04
+objective_integration:
+  '1':
+    level: informational
+  '3':
+    level: integrated
+  '4':
+    level: n/a

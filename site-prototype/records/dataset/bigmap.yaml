@@ -1,0 +1,7 @@
+# PROTOTYPE record. STAC-sourced: title and summary come from D2S at build time.
+id: bigmap
+source:
+  stac:
+    collection: e1cdddec-9215-47f8-87aa-f73ac3058d94
+access: public
+availability: published

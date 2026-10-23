@@ -1,0 +1,33 @@
+# PROTOTYPE record, roughly drafted from the tracker for the site prototype.
+id: O2-16
+tracker_id: O2-16
+title: Objective 1 Data, STAC, and Cloud Platform Integration
+summary: Brings FIA, LiDAR, imagery, canopy-height, biomass, forest-structure, and
+  other Objective 1 products into the Objective 2 data platform and model/visualization
+  workflows. Maintains a Spatio-Temporal Asset Catalog (STAC) repository and automated
+  ingestion processes that make large geospatial datasets easier to find and access.
+  Provides a cloud-based environment for integrating, analyzing, visualizing, and
+  sharing FIA, airborne LiDAR, imagery, and other PERSEUS geospatial data.
+status: active
+phase: integration
+primary_task:
+  task: '2.4'
+supporting_tasks:
+- task: '2.1'
+- task: '2.3'
+leads:
+- name: Ayman Habib
+  institution: purdue
+  unconfirmed: true
+- name: Jinha Jung
+  institution: purdue
+  unconfirmed: true
+lead_institution:
+  institution: purdue
+objective_integration:
+  '1':
+    level: integrated
+  '3':
+    level: informational
+  '4':
+    level: n/a

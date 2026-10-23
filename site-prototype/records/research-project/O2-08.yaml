@@ -1,0 +1,31 @@
+# PROTOTYPE record, roughly drafted from the tracker for the site prototype.
+id: O2-08
+tracker_id: O2-08
+title: UGA Timber Supply Model and Results Website
+summary: Refines a UGA timber-supply model focused on forecasting prices, supply,
+  and forest structure and presents major results through a website or online interface.
+status: active
+phase: development
+primary_task:
+  task: '2.2'
+supporting_tasks:
+- task: '2.3'
+- task: '2.4'
+leads:
+- name: Bruno da Silva
+  institution: uga
+  unconfirmed: true
+- name: Chaz Merritt
+  institution: uga
+  unconfirmed: true
+lead_institution:
+  institution: uga
+depends_on:
+- project: O2-04
+objective_integration:
+  '1':
+    level: informational
+  '3':
+    level: collaborative
+  '4':
+    level: n/a

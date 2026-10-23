@@ -1,0 +1,26 @@
+# PROTOTYPE record, roughly drafted from the tracker for the site prototype.
+id: O2-04
+tracker_id: O2-04
+title: Survey-to-Scenario Integration
+summary: Synthesizes Delphi, forest-management, landowner, and business survey findings
+  into explicit 'what-if' assumptions and scenario parameters that can be used by
+  Objective 2 models.
+status: active
+phase: integration
+primary_task:
+  task: '2.2'
+supporting_tasks:
+- task: '2.1'
+leads:
+- name: Adam Daigneault
+  institution: umaine
+  unconfirmed: true
+lead_institution:
+  institution: umaine
+objective_integration:
+  '1':
+    level: informational
+  '3':
+    level: integrated
+  '4':
+    level: n/a

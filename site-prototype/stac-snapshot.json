@@ -1,0 +1,14 @@
+{
+  "f8934dd1-75c0-4fa0-9c75-b29c8e4c7dc1": {
+    "title": "TreeMap",
+    "description": "Geospatial data describing tree species or forest structure at national scale",
+    "license": "CC-BY-NC-4.0",
+    "doi": "10.2737/RDS-2025-0032"
+  },
+  "e1cdddec-9215-47f8-87aa-f73ac3058d94": {
+    "title": "BigMap",
+    "description": "The Forest Inventory and Analysis (FIA) BIGMAP Tree Species Aboveground Forest Biomass. More details about species code can be found at https://data.fs.usda.gov/geodata/rastergateway/bigmap/index.php ",
+    "license": "CC-BY-NC-4.0",
+    "doi": "10.1016/j.isprsjprs.2018.01.006"
+  }
+}
