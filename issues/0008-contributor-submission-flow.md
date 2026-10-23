@@ -3,7 +3,7 @@ title: How does a non-Git contributor submit or update a record?
 labels: [wayfinder:prototype]
 parent: 1
 blocked_by: [6]
-assignee:
+assignee: chazm
 status: open
 ---
 

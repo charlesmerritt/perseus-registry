@@ -3,7 +3,7 @@ title: What should the static wiki look like, and what generates it?
 labels: [wayfinder:prototype]
 parent: 1
 blocked_by: [6]
-assignee:
+assignee: chazm
 status: open
 ---
 
