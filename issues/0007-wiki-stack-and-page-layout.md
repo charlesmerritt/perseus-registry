@@ -4,7 +4,7 @@ labels: [wayfinder:prototype]
 parent: 1
 blocked_by: [6]
 assignee: chazm
-status: open
+status: closed
 ---
 
 ## Question
@@ -15,4 +15,16 @@ Constraint added after the relationship ticket: the stack must also host **schem
 
 ## Prototype
 
-Built as a prototype on branch `prototype/wiki-and-submission` (kept as the primary source, ending at `99564aa`), then promoted (user decision, 2026-10-23) to the canonical app in `site/`; see `site/README.md`. Run `uv run site/build.py --serve` and flip layouts with `?variant=A|B|C`. The site generator question is settled in practice: a small Python generator, not MkDocs. Layout and destination choices are still pending user review.
+Built as a prototype on branch `prototype/wiki-and-submission` (kept as the primary source, ending at `99564aa`), then promoted (user decision, 2026-10-23) to the canonical app in `site/`; see `site/README.md`. The prototype carried three layouts per page; the Resolution below records which were kept.
+
+## Resolution
+
+Decided by the user, 2026-10-23, after reviewing the prototype:
+
+- **Generator**: a small Python generator (`site/build.py`), not MkDocs Material. It is plain Python string templates over `records/`, and the schema-driven form is one more generated page with its own script, so embedding forms costs nothing extra.
+- **Directory**: the sortable, filterable table is the index (`index.html`). The outline by Objective, then Task, is kept as a second view (`objectives.html`), linked from the nav. The connection matrix is dropped.
+- **Research Project page**: wiki article plus infobox. Prose sections run down the page, structured facts sit in the infobox, then the Datasets table and the generated "What links here". The dashboard and long-read layouts are dropped.
+- **Where prose lives**: a sidecar `<id>.md` next to `<id>.yaml`. The YAML stays plain for the schema validator and the form. Frontmatter-in-one-`.md` support is removed from the loader.
+
+Implemented in `site/`. Only `submit.html` still carries layout variants, pending issue 0008.
+

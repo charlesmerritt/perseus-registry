@@ -1,4 +1,4 @@
-// Layout switcher (until layouts are chosen, issue 0007): ?variant=A|B|C, floating bar, ← → keys.
+// Form layout switcher (until the form layout is chosen, issue 0008): ?variant=A|B|C, floating bar, ← → keys.
 (function () {
   const secs = [...document.querySelectorAll("section.variant")];
   const keys = secs.map((s) => s.dataset.variant);
@@ -19,16 +19,6 @@
     const p = new URLSearchParams(location.search);
     p.set("variant", k);
     history.replaceState(null, "", "?" + p + location.hash);
-    // carry the variant across internal links so a reviewer stays in one layout
-    document.querySelectorAll("a[href]").forEach((a) => {
-      const h = a.getAttribute("href");
-      if (/^https?:|^#|^mailto:/.test(h)) return;
-      const [rest, hash = ""] = h.split("#");
-      const [path, q = ""] = rest.split("?");
-      const ap = new URLSearchParams(q);
-      ap.set("variant", k);
-      a.setAttribute("href", path + "?" + ap + (hash ? "#" + hash : ""));
-    });
     document.dispatchEvent(new CustomEvent("variantchange", { detail: k }));
   }
   const step = (d) => show(keys[(keys.indexOf(cur) + d + keys.length) % keys.length]);
@@ -43,23 +33,3 @@
   });
   show(cur);
 })();
-
-// directory table helpers
-function filterRows(input) {
-  const q = input.value.toLowerCase();
-  input.parentElement.querySelectorAll("table.dir tbody tr").forEach((tr) => {
-    tr.hidden = q && !tr.textContent.toLowerCase().includes(q);
-  });
-}
-document.querySelectorAll("table.sortable th").forEach((th, i) => {
-  th.onclick = () => {
-    const tb = th.closest("table").tBodies[0];
-    const dir = (th.dataset.dir = th.dataset.dir === "1" ? "-1" : "1");
-    [...tb.rows]
-      .sort((a, b) => {
-        const k = (r) => r.cells[i].dataset.sort ?? r.cells[i].textContent;
-        return String(k(a)).localeCompare(String(k(b)), undefined, { numeric: true }) * dir;
-      })
-      .forEach((r) => tb.appendChild(r));
-  };
-});

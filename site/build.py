@@ -3,9 +3,10 @@
 # ///
 """Static wiki generator for the Perseus Research Registry.
 
-Builds the site from records/: directory, record pages, People, Mentions, and
-a schema-driven submission form (submit.html). Until layouts are chosen
-(issue 0007), each page carries three layouts switchable with ?variant=A|B|C.
+Builds the site from records/: directory, by-Objective outline, record pages,
+People, Mentions, and a schema-driven submission form (submit.html). Until the
+form layout is chosen (issue 0008), submit.html carries three layouts
+switchable with ?variant=A|B|C.
 
     uv run site/build.py           build into site/_site/
     uv run site/build.py --serve   build, then serve on :8000
@@ -28,32 +29,21 @@ TASKS = {"2.1": "Landowner Optimization", "2.2": "Broad Simulation", "2.3": "Val
 RETIRED = ["RP-09", "RP-13", "RP-14"]
 PHASES = ["concept", "development", "validation", "integration", "operational"]
 PROSE = ["Overview", "Goals and milestones", "Needs from other Objectives", "Integration notes", "Methods"]
-LEVELS = ["integrated", "collaborative", "informational", "discuss", "n/a"]
 e = html.escape
 
 
 # ---------------------------------------------------------------- loading
 
-def load_file(path):
-    """A record is X.yaml (+ optional X.md sidecar body) or X.md with frontmatter."""
-    text = path.read_text()
-    if path.suffix == ".md":
-        _, front, body = text.split("---\n", 2)
-        return yaml.safe_load(front), body, "frontmatter"
-    side = path.with_suffix(".md")
-    return yaml.safe_load(text), side.read_text() if side.exists() else "", "sidecar"
-
-
 def load_records():
+    """A record is X.yaml; its prose, if any, is the sidecar X.md (issue 0007)."""
     recs = {t: {} for t in TYPES}
-    for root in (REPO / "records",):
-        for t in TYPES:
-            for f in sorted((root / t).glob("*")):
-                if f.suffix == ".md" and f.with_suffix(".yaml").exists():
-                    continue
-                rec, body, style = load_file(f)
-                rec["_body"], rec["_prose_style"], rec["_file"] = body, style, str(f.relative_to(REPO))
-                recs[t][rec["id"]] = rec
+    for t in TYPES:
+        for f in sorted((REPO / "records" / t).glob("*.yaml")):
+            rec = yaml.safe_load(f.read_text())
+            side = f.with_suffix(".md")
+            rec["_body"] = side.read_text() if side.exists() else ""
+            rec["_file"], rec["_prose_file"] = str(f.relative_to(REPO)), str(side.relative_to(REPO))
+            recs[t][rec["id"]] = rec
     return recs
 
 
@@ -255,44 +245,30 @@ def count_unconfirmed(node):
     return 0
 
 
-def unconfirmed_items(recs, p):
-    items = []
-    def walk(node, where):
-        if isinstance(node, dict):
-            if node.get("unconfirmed"):
-                label = node.get("name") or node.get("task") or target(node.get("dataset")) or target(node.get("institution")) \
-                    or target(node.get("project")) or (node.get("dataset") or node.get("institution") or node.get("project") or {}).get("name", "?")
-                items.append((where, label, node.get("note") or ""))
-            for k, v in node.items():
-                if not k.startswith("_"):
-                    walk(v, k if isinstance(v, (list, dict)) and k not in ("institution", "dataset", "project") else where)
-        elif isinstance(node, list):
-            for v in node:
-                walk(v, where)
-    walk(p, "record")
-    return items
-
-
 # ---------------------------------------------------------------- page shell
 
-def page(title, variants, active="", extra_head=""):
-    names = " ".join(f'{k}:{e(n)}' for k, n, _ in variants)
-    secs = "\n".join(f'<section class="variant v{k}" data-variant="{k}" data-name="{e(n)}">{body}</section>'
-                     for k, n, body in variants)
+def page(title, body, active="", head=""):
     nav = "".join(f'<a href="{h}" class="{"on" if h == active else ""}">{l}</a>' for h, l in
-                  (("index.html", "Directory"), ("people.html", "People"), ("mentions.html", "Mentions"), ("submit.html", "Submit or update a record")))
+                  (("index.html", "Directory"), ("objectives.html", "By Objective"), ("people.html", "People"),
+                   ("mentions.html", "Mentions"), ("submit.html", "Submit or update a record")))
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{e(title)} · Perseus Research Registry</title>
-<link rel="stylesheet" href="style.css">{extra_head}</head>
-<body data-variants="{names}">
-<div class="proto-banner">DRAFT · layouts still being chosen (issue 0007): use ← → to compare · records are seeded, many facts unconfirmed</div>
+<link rel="stylesheet" href="style.css">{head}</head>
+<body>
+<div class="draft-banner">DRAFT · records are seeded, many facts unconfirmed</div>
 <header class="site"><a class="brand" href="index.html">Perseus Research Registry</a><nav>{nav}</nav></header>
-<main>{secs}</main>
-<script src="switcher.js"></script></body></html>"""
+<main>{body}</main>
+<script src="site.js"></script></body></html>"""
 
 
-# ---------------------------------------------------------------- project page: three layouts
+def variants(vs):
+    """Alternative layouts of one page, flipped by switcher.js (form only, until issue 0008)."""
+    return "\n".join(f'<section class="variant v{k}" data-variant="{k}" data-name="{e(n)}">{body}</section>'
+                     for k, n, body in vs)
+
+
+# ---------------------------------------------------------------- project page
 
 def project_blocks(recs, p):
     b = {}
@@ -321,22 +297,23 @@ def project_blocks(recs, p):
         f'<tr><th>{k} {OBJECTIVES[k]}</th><td>{level_chip(oi[k]) if k in oi else ("<i class=muted>own Objective</i>" if k == o else "<i class=muted>not stated</i>")}</td><td class="note">{e((oi.get(k) or {}).get("note") or "")}</td></tr>'
         for k in OBJECTIVES)
     b["prose"] = prose_sections(p["_body"])
-    b["file"] = f'<p class="filenote">Source: <code>{e(p["_file"])}</code> · prose stored as <b>{p["_prose_style"]}</b>{"" if p["_body"] else " (none yet)"}</p>'
+    b["file"] = f'<p class="filenote">Source: <code>{e(p["_file"])}</code> · prose: <code>{e(p["_prose_file"])}</code>{"" if p["_body"] else " (none yet)"}</p>'
     return b
 
 
-def project_A(recs, p, b):
+def project_page(recs, p):
     """Wiki article with an infobox."""
+    b = project_blocks(recs, p)
     prose = "".join(f"<h2>{e(h)}</h2>{t}" for h, t in b["prose"].items()) or '<p class="muted">No prose sections yet. <a href="submit.html">Add some</a>.</p>'
-    return f"""<div class="a-wrap"><article class="a-article">
+    return f"""<div class="wiki"><article class="wiki-article">
 <p class="crumbs">{b["objective"]} › {b["task"]}</p>
 <h1>{e(p["title"])} <span class="pid">{e(p["id"])}</span></h1>
 <p class="lede">{e(p["summary"])}</p>{prose}
-<h2>Datasets</h2><table class="a-table"><tr><th>Inputs</th><th>Outputs</th></tr>
+<h2>Datasets</h2><table class="ds-table"><tr><th>Inputs</th><th>Outputs</th></tr>
 <tr><td><ul>{b["inputs"]}</ul></td><td><ul>{b["outputs"]}</ul></td></tr></table>
 <h2>What links here</h2><ul>{b["downstream"] or '<li class="muted">nothing yet</li>'}</ul>{b["file"]}
 </article>
-<aside class="a-infobox"><div class="ib-title">{e(p["id"])}</div>
+<aside class="infobox"><div class="ib-title">{e(p["id"])}</div>
 <table>
 <tr><th>Status</th><td>{b["status"]}</td></tr>
 <tr><th>Objective</th><td>{b["objective"]}</td></tr>
@@ -355,64 +332,9 @@ def project_A(recs, p, b):
 </aside></div>"""
 
 
-def project_B(recs, p, b):
-    """Structured dashboard first, prose in tabs underneath."""
-    tabs = "".join(f'<input type="radio" name="t-{e(p["id"])}" id="t{i}" {"checked" if i == 0 else ""}><label for="t{i}">{e(h)}</label>'
-                   for i, h in enumerate(b["prose"]))
-    panes = "".join(f'<div class="pane">{t}</div>' for t in b["prose"].values())
-    return f"""<div class="b-head"><div><span class="pid big">{e(p["id"])}</span> {b["status"]}</div>
-<h1>{e(p["title"])}</h1><p>{e(p["summary"])}</p>
-<a class="btn light" href="submit.html?edit={e(p["id"])}">Edit</a></div>
-<div class="b-flow">
- <div class="b-col"><h3>Upstream projects</h3><ul>{b["upstream"] or '<li class="muted">none</li>'}</ul></div>
- <div class="b-col"><h3>Input datasets</h3><ul>{b["inputs"]}</ul></div>
- <div class="b-col b-me"><h3>{e(p["id"])}</h3><p>via</p><ul>{b["software"]}</ul></div>
- <div class="b-col"><h3>Output datasets</h3><ul>{b["outputs"]}</ul></div>
- <div class="b-col"><h3>Downstream projects</h3><ul>{b["downstream"] or '<li class="muted">none</li>'}</ul></div>
-</div>
-<div class="b-grid">
- <div class="panel"><h3>Objective &amp; Task</h3><p>{b["objective"]}</p><p>{b["task"]}</p><p class="muted">Supports: {b["supporting"]}</p></div>
- <div class="panel"><h3>Leads</h3><ul>{b["leads"]}</ul></div>
- <div class="panel"><h3>Institutions</h3><p>Lead: {b["lead_inst"]}</p><ul>{b["institutions"]}</ul></div>
- <div class="panel"><h3>Collaborators</h3><ul>{b["collab"] or '<li class="muted">none</li>'}</ul></div>
- <div class="panel"><h3>Integration Level</h3><table class="int">{b["integration"]}</table></div>
- <div class="panel"><h3>Related</h3><ul>{b["related"] or '<li class="muted">none</li>'}</ul></div>
-</div>
-<div class="b-tabs">{tabs}{panes}</div>
-{b["file"]}"""
+# ---------------------------------------------------------------- directory
 
-
-def project_C(recs, p, b):
-    """Long-read with a confirmation checklist; facts as a compact sheet."""
-    items = unconfirmed_items(recs, p)
-    todo = "".join(f'<li><label><input type="checkbox"> <b>{e(str(lbl))}</b> <span class="muted">({e(w)})</span></label>{"<div class=note>" + e(n) + "</div>" if n else ""}</li>' for w, lbl, n in items)
-    toc = "".join(f'<li><a href="#c-{i}">{e(h)}</a></li>' for i, h in enumerate(b["prose"]))
-    prose = "".join(f'<h2 id="c-{i}">{e(h)}</h2>{t}' for i, (h, t) in enumerate(b["prose"].items()))
-    return f"""<div class="c-wrap">
-<nav class="c-side"><p class="pid big">{e(p["id"])}</p><p>{b["status"]}</p><ol>{toc}</ol>
-<a href="submit.html?edit={e(p["id"])}">Edit record →</a></nav>
-<article class="c-main">
-<h1>{e(p["title"])}</h1><p class="lede">{e(p["summary"])}</p>
-<dl class="c-sheet">
-<dt>Belongs to</dt><dd>{b["objective"]} › {b["task"]}</dd>
-<dt>Also supports</dt><dd>{b["supporting"]}</dd>
-<dt>Led by</dt><dd>{b["lead_inst"]}<ul class="inline">{b["leads"]}</ul></dd>
-<dt>With</dt><dd><ul class="inline">{b["collab"]}{b["institutions"]}</ul></dd>
-<dt>Takes in</dt><dd><ul>{b["inputs"]}</ul></dd>
-<dt>Produces</dt><dd><ul>{b["outputs"]}</ul></dd>
-<dt>Needs work from</dt><dd><ul>{b["upstream"]}</ul></dd>
-<dt>Feeds</dt><dd><ul>{b["downstream"] or '<li class="muted">nothing yet</li>'}</ul></dd>
-<dt>Other Objectives</dt><dd><table class="int">{b["integration"]}</table></dd>
-</dl>{prose}{b["file"]}</article>
-<aside class="c-todo"><h3>Needs confirming ({len(items)})</h3>
-<p class="muted">Stated but not yet verified by the people involved. Are you one of them?</p>
-<ul>{todo or '<li class="muted">Everything is confirmed.</li>'}</ul>
-<a class="btn" href="submit.html?edit={e(p["id"])}">Confirm or correct</a></aside></div>"""
-
-
-# ---------------------------------------------------------------- directory: three layouts
-
-def directory_A(recs, P):
+def directory_page(recs, P):
     """Sortable, filterable table."""
     rows = "".join(f"""<tr><td><a href="p-{e(p["id"])}.html">{e(p["id"])}</a></td><td><a href="p-{e(p["id"])}.html">{e(p["title"])}</a></td>
 <td>{task(p["primary_task"])}</td><td>{chip(p["status"], "st-" + p["status"])}</td><td data-sort="{PHASES.index(p["phase"]) if p.get("phase") else 9}">{phase_chip(p)}</td>
@@ -424,7 +346,7 @@ def directory_A(recs, P):
 <tbody>{rows}</tbody></table>"""
 
 
-def directory_B(recs, P):
+def objectives_page(recs, P):
     """Outline grouped by Objective then Task."""
     out = [f"<h1>Perseus research, by Objective</h1><p>{phase_legend()}</p>"]
     for o, oname in OBJECTIVES.items():
@@ -445,34 +367,10 @@ def directory_B(recs, P):
     return "".join(out)
 
 
-def directory_C(recs, P):
-    """Connection matrix: Tasks and Objective integration at a glance."""
-    head = "<th>Phase</th>" + "".join(f"<th>{t}</th>" for t in TASKS) + "".join(f'<th>Obj {o}<br><small>{n}</small></th>' for o, n in OBJECTIVES.items())
-    rows = []
-    for p in P:
-        sup = {t["task"] for t in p.get("supporting_tasks") or []}
-        cells = f'<td class="m">{phase_chip(p)}</td>' + "".join(f'<td class="m">{"●" if p["primary_task"]["task"] == t else ("○" if t in sup else "")}</td>' for t in TASKS)
-        oi = p.get("objective_integration") or {}
-        for o in OBJECTIVES:
-            if o == objective_of(p):
-                cells += '<td class="m own">own</td>'
-            elif o in oi:
-                cells += f'<td class="m lvbg-{oi[o]["level"].replace("/", "")}" title="{e(oi[o].get("note") or "")}">{e(oi[o]["level"])}</td>'
-            else:
-                cells += '<td class="m"></td>'
-        deps = len(p.get("depends_on") or []) + len(p["_provides_to"]) + len(p["_depended_by"])
-        rows.append(f'<tr><th class="rowh"><a href="p-{e(p["id"])}.html">{e(p["id"])}</a> {e(p["title"][:48])}{"…" if len(p["title"]) > 48 else ""}</th>{cells}<td class="m">{deps}</td></tr>')
-    legend = " ".join(f'<span class="lv lv-{l.replace("/", "")}">{l}</span>' for l in LEVELS)
-    return f"""<h1>How the Research Projects connect</h1>
-<p class="muted">● primary Task · ○ supporting Task · Objective cells show Integration Level: {legend}</p>
-<div class="scroll"><table class="matrix"><thead><tr><th></th>{head}<th>links</th></tr></thead><tbody>{"".join(rows)}</tbody></table></div>"""
-
-
-# ---------------------------------------------------------------- other record pages (one layout)
+# ---------------------------------------------------------------- other record pages
 
 def simple(title, sub, body_html, rid, kind):
-    one = f'<div class="simple"><p class="crumbs">{e(kind)}</p><h1>{title} <span class="pid">{e(rid)}</span></h1>{sub}{body_html}</div>'
-    return [("A", "Record page (single layout)", one)]
+    return f'<div class="simple"><p class="crumbs">{e(kind)}</p><h1>{title} <span class="pid">{e(rid)}</span></h1>{sub}{body_html}</div>'
 
 
 def dataset_page(recs, d):
@@ -530,13 +428,13 @@ def people_page(recs):
 Use the filter to find someone; click any name on the site to land here.</p>
 <input class="filter" placeholder="Filter by name, institution, project…" oninput="filterRows(this)">
 <table class="dir people"><thead><tr><th>Name</th><th>Institution(s)</th><th>Research Projects and roles</th></tr></thead><tbody>{"".join(rows)}</tbody></table></div>"""
-    return [("A", "People directory (single layout)", body)]
+    return body
 
 
 def mentions_page(recs, mentions):
     rows = "".join(f'<tr><td>{e(n)}</td><td>{e(k or "")}</td><td>{pid(recs, o)}</td></tr>' for o, k, n in sorted(mentions, key=lambda m: m[2]))
-    return [("A", "Mentions (single layout)", f"""<div class="simple"><h1>Mentions</h1><p class="muted">Things referenced by name but not yet registered.
-Each is a candidate for a new record.</p><table class="dir"><tr><th>Mentioned as</th><th>Field</th><th>On</th></tr>{rows}</table></div>""")]
+    return f"""<div class="simple"><h1>Mentions</h1><p class="muted">Things referenced by name but not yet registered.
+Each is a candidate for a new record.</p><table class="dir"><tr><th>Mentioned as</th><th>Field</th><th>On</th></tr>{rows}</table></div>"""
 
 
 # ---------------------------------------------------------------- submit page
@@ -554,10 +452,13 @@ def submit_page(recs):
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ajv/8.17.1/ajv2019.bundle.min.js"></script>
 <script>window.REGISTRY = {json.dumps(reg)};
 window.SCHEMA = {(REPO / "schema/generated/fdis_registry.schema.json").read_text()};</script>
+<script src="switcher.js" defer></script>
 <script src="form.js" defer></script>"""
     mk = lambda k: f'<div class="submit-root" data-layout="{k}"></div>'
-    return page("Submit or update a record", [("A", "Long form + section nav", mk("A")), ("B", "Step-by-step wizard", mk("B")),
-                                              ("C", "Split: form + live YAML", mk("C"))], "submit.html", head)
+    body = variants([("A", "Long form + section nav", mk("A")), ("B", "Step-by-step wizard", mk("B")),
+                     ("C", "Split: form + live YAML", mk("C"))])
+    return page("Submit or update a record", '<p class="draft-note">Form layout still being chosen (issue 0008): use ← → to compare.</p>' + body,
+                "submit.html", head)
 
 
 def clean(r):
@@ -575,18 +476,15 @@ def main():
     if OUT.exists():
         shutil.rmtree(OUT)
     OUT.mkdir()
-    for f in ("style.css", "switcher.js", "form.js"):
+    for f in ("style.css", "site.js", "switcher.js", "form.js"):
         shutil.copy(HERE / "assets" / f, OUT / f)
     shutil.copy(REPO / "schema/generated/fdis_registry.schema.json", OUT / "fdis_registry.schema.json")
     P = sorted(recs["research-project"].values(), key=lambda p: p["id"])
     w = lambda name, html_: (OUT / name).write_text(html_)
-    w("index.html", page("Directory", [("A", "Sortable table", directory_A(recs, P)), ("B", "Outline by Objective", directory_B(recs, P)),
-                                        ("C", "Connection matrix", directory_C(recs, P))], "index.html"))
+    w("index.html", page("Directory", directory_page(recs, P), "index.html"))
+    w("objectives.html", page("By Objective", objectives_page(recs, P), "objectives.html"))
     for p in P:
-        b = project_blocks(recs, p)
-        w(f"p-{p['id']}.html", page(p["title"], [("A", "Wiki article + infobox", project_A(recs, p, b)),
-                                                 ("B", "Dashboard + data flow", project_B(recs, p, b)),
-                                                 ("C", "Long-read + confirm checklist", project_C(recs, p, b))]))
+        w(f"p-{p['id']}.html", page(p["title"], project_page(recs, p)))
     for d in recs["dataset"].values():
         w(f"d-{d['id']}.html", page(title_of(recs, "dataset", d["id"]), dataset_page(recs, d)))
     for s in recs["software"].values():
