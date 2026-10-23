@@ -54,12 +54,10 @@
     return out;
   }
 
-  // ---- ID assignment: O{objective}-{nn}, never reusing retired numbers ----
+  // ---- ID assignment: neutral RP-{nn}, consortium-wide, never reusing retired numbers ----
   function nextId() {
-    const o = ((S.rec.primary_task || {}).task || "").split(".")[0];
-    if (!/^[1-4]$/.test(o)) return "";
-    const used = [...Object.keys(REG.projects), ...REG.retired].filter((x) => x.startsWith(`O${o}-`)).map((x) => +x.slice(3));
-    return `O${o}-${String(Math.max(0, ...used) + 1).padStart(2, "0")}`;
+    const used = [...Object.keys(REG.projects), ...REG.retired].map((x) => +x.slice(3));
+    return `RP-${String(Math.max(0, ...used) + 1).padStart(2, "0")}`;
   }
   const currentId = () => S.editing || nextId();
 
@@ -116,7 +114,7 @@
     const name = refName(s);
     const d = deref(s);
     if (key === "id") {
-      return { el: h("input", { type: "text", readonly: true, value: currentId() || "(assigned from the primary Task)", class: "f-id" }), noHelp: false };
+      return { el: h("input", { type: "text", readonly: true, value: currentId(), class: "f-id" }), noHelp: false };
     }
     if (isPicker(s)) return { el: picker(key, path) };
     if (d.enum) {
@@ -457,7 +455,7 @@
     if (errs) errs.style.whiteSpace = "pre-wrap";
     const st = root.querySelector(".f-status");
     if (st) { st.textContent = S.errors.length ? `${S.errors.length} problem(s)` : "✓ valid against FDIS Registry Profile v0.1"; st.className = "f-status " + (S.errors.length ? "bad" : "ok"); }
-    if (idMayChange) { const idEl = root.querySelector(".f-id"); if (idEl) idEl.value = currentId() || "(assigned from the primary Task)"; root.querySelector(".f-top b").textContent = S.editing ? `Editing ${S.editing}` : `New Research Project ${currentId() ? "→ " + currentId() : ""}`; }
+    if (idMayChange) { const idEl = root.querySelector(".f-id"); if (idEl) idEl.value = currentId(); root.querySelector(".f-top b").textContent = S.editing ? `Editing ${S.editing}` : `New Research Project ${currentId() ? "→ " + currentId() : ""}`; }
     root.querySelectorAll(".dest").forEach((d) => d.redraw && !d.contains(document.activeElement) && d.redraw());
   }
 

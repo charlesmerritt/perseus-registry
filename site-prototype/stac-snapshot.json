@@ -10,5 +10,35 @@
     "description": "The Forest Inventory and Analysis (FIA) BIGMAP Tree Species Aboveground Forest Biomass. More details about species code can be found at https://data.fs.usda.gov/geodata/rastergateway/bigmap/index.php ",
     "license": "CC-BY-NC-4.0",
     "doi": "10.1016/j.isprsjprs.2018.01.006"
+  },
+  "3dep": {
+    "title": "3DEP",
+    "description": "A collection of USGS 3DEP Lidar hosted on AWS s3.",
+    "license": "US-Government-Public-Domain",
+    "doi": null
+  },
+  "bfff8c87-1974-4442-9963-d09f35cbd79e": {
+    "title": "Aboveground Biomass for Howland Forest, Maine, 2012-2023",
+    "description": "This dataset holds aboveground biomass (AGB) estimates at 10-m spatial resolution for the Howland Research Forest in central Maine for 2012, 2015, 2017, 2021, and 2023. Forest inventory data were collected using 50 fixed-area plot sampling during the summers of 2021, 2023, and 2024. ",
+    "license": "CC-BY-NC-4.0",
+    "doi": "10.3334/ORNLDAAC/2434"
+  },
+  "indiana-lidar-ndhm": {
+    "title": "Indiana LiDAR NDHM",
+    "description": "NDHM for Indiana Statewide",
+    "license": "ISC",
+    "doi": null
+  },
+  "indiana-lidar-point-cloud": {
+    "title": "Indiana LiDAR Point Cloud",
+    "description": "Point Cloud for Indiana Statewide",
+    "license": "ISC",
+    "doi": null
+  },
+  "22913402-bfc7-4951-9165-5e75fdd7f27f": {
+    "title": "Forest Aboveground Biomass for Maine, 2023",
+    "description": "This dataset holds estimates of forest aboveground biomass (AGB) for Maine, USA, in 2023. AGB was estimated using airborne LiDAR data from the USGS 3DEP project and a deep learning convolutional neural network (CNN) model. ",
+    "license": "CC-BY-NC-4.0",
+    "doi": "10.3334/ORNLDAAC/2435"
   }
 }

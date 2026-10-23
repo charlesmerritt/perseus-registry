@@ -18,15 +18,16 @@
     label.textContent = keys.length > 1 ? `${k} (${s.dataset.name}) · ${keys.indexOf(k) + 1}/${keys.length}` : `${s.dataset.name}`;
     const p = new URLSearchParams(location.search);
     p.set("variant", k);
-    history.replaceState(null, "", "?" + p);
+    history.replaceState(null, "", "?" + p + location.hash);
     // carry the variant across internal links so a reviewer stays in one layout
     document.querySelectorAll("a[href]").forEach((a) => {
       const h = a.getAttribute("href");
       if (/^https?:|^#|^mailto:/.test(h)) return;
-      const [path, q = ""] = h.split("?");
+      const [rest, hash = ""] = h.split("#");
+      const [path, q = ""] = rest.split("?");
       const ap = new URLSearchParams(q);
       ap.set("variant", k);
-      a.setAttribute("href", path + "?" + ap);
+      a.setAttribute("href", path + "?" + ap + (hash ? "#" + hash : ""));
     });
     document.dispatchEvent(new CustomEvent("variantchange", { detail: k }));
   }
@@ -55,7 +56,10 @@ document.querySelectorAll("table.sortable th").forEach((th, i) => {
     const tb = th.closest("table").tBodies[0];
     const dir = (th.dataset.dir = th.dataset.dir === "1" ? "-1" : "1");
     [...tb.rows]
-      .sort((a, b) => a.cells[i].textContent.localeCompare(b.cells[i].textContent, undefined, { numeric: true }) * dir)
+      .sort((a, b) => {
+        const k = (r) => r.cells[i].dataset.sort ?? r.cells[i].textContent;
+        return String(k(a)).localeCompare(String(k(b)), undefined, { numeric: true }) * dir;
+      })
       .forEach((r) => tb.appendChild(r));
   };
 });

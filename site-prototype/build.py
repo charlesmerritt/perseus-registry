@@ -24,7 +24,8 @@ STAC = "https://stac.d2s.org/api/v1/collections/"
 TYPES = {"research-project": "p", "software": "s", "dataset": "d", "institution": "i", "publication": "pub"}
 OBJECTIVES = {"1": "Measurement", "2": "Modeling", "3": "Management", "4": "Mindset"}
 TASKS = {"2.1": "Landowner Optimization", "2.2": "Broad Simulation", "2.3": "Value Chain", "2.4": "Data Visualization"}
-RETIRED = ["O2-09", "O2-13", "O2-14"]
+RETIRED = ["RP-09", "RP-13", "RP-14"]
+PHASES = ["concept", "development", "validation", "integration", "operational"]
 PROSE = ["Overview", "Goals and milestones", "Needs from other Objectives", "Integration notes", "Methods"]
 LEVELS = ["integrated", "collaborative", "informational", "discuss", "n/a"]
 e = html.escape
@@ -44,8 +45,7 @@ def load_file(path):
 
 def load_records():
     recs = {t: {} for t in TYPES}
-    # examples first, prototype records override by id
-    for root in (REPO / "examples", HERE / "records"):
+    for root in (REPO / "records",):
         for t in TYPES:
             for f in sorted((root / t).glob("*")):
                 if f.suffix == ".md" and f.with_suffix(".yaml").exists():
@@ -118,6 +118,26 @@ def derive(recs):
     return mentions
 
 
+# People are inline, not records: index them by ORCID, else by name (record-schemas ticket).
+PEOPLE = {}
+
+
+def person_key(x):
+    return x.get("orcid") or re.sub(r"[^a-z0-9]+", "-", x["name"].lower()).strip("-")
+
+
+def index_people(recs):
+    roles = [("research-project", "leads", "Lead"), ("research-project", "collaborators", "Collaborator"),
+             ("software", "maintainers", "Maintainer"), ("publication", "authors", "Author")]
+    for t, field, role in roles:
+        for r in recs[t].values():
+            for x in r.get(field) or []:
+                p = PEOPLE.setdefault(person_key(x), {"name": x["name"], "orcid": x.get("orcid"), "institutions": [], "on": []})
+                if x["institution"] not in p["institutions"]:
+                    p["institutions"].append(x["institution"])
+                p["on"].append((t, r["id"], x.get("role") or role, x))
+
+
 def walk_mentions(node, owner, out, key=None):
     if isinstance(node, dict):
         if set(node) <= {"name", "unconfirmed", "note"} and "name" in node and key not in (None, "leads", "collaborators", "maintainers", "authors"):
@@ -159,8 +179,12 @@ def pid(recs, i):
     return f'<a href="p-{e(i)}.html"><b>{e(i)}</b> {e(title_of(recs, "research-project", i))}</a>'
 
 
+def person_link(x):
+    return unc(f'<a class="person" href="people.html#{e(person_key(x))}">{e(x["name"])}</a>', x)
+
+
 def person(recs, x):
-    s = e(x["name"])
+    s = f'<a class="person" href="people.html#{e(person_key(x))}">{e(x["name"])}</a>'
     if x.get("orcid"):
         s += f' <a class="orcid" href="https://orcid.org/{e(x["orcid"])}">iD</a>'
     s += f' <span class="muted">· {ref(recs, "institution", x["institution"])}</span>'
@@ -180,6 +204,17 @@ def objective_of(p):
 
 def chip(text, cls=""):
     return f'<span class="chip {cls}">{e(text)}</span>'
+
+
+def phase_chip(p):
+    ph = p.get("phase")
+    if not ph:
+        return ""
+    return f'<span class="phase ph-{ph}" title="Phase {PHASES.index(ph) + 1} of {len(PHASES)}">{e(ph)}</span>'
+
+
+def phase_legend():
+    return '<span class="muted">Phase:</span> ' + " ".join(f'<span class="phase ph-{x}">{x}</span>' for x in PHASES)
 
 
 def level_chip(entry):
@@ -244,7 +279,7 @@ def page(title, variants, active="", extra_head=""):
     secs = "\n".join(f'<section class="variant v{k}" data-variant="{k}" data-name="{e(n)}">{body}</section>'
                      for k, n, body in variants)
     nav = "".join(f'<a href="{h}" class="{"on" if h == active else ""}">{l}</a>' for h, l in
-                  (("index.html", "Directory"), ("mentions.html", "Mentions"), ("submit.html", "Submit or update a record")))
+                  (("index.html", "Directory"), ("people.html", "People"), ("mentions.html", "Mentions"), ("submit.html", "Submit or update a record")))
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{e(title)} · Perseus Registry (prototype)</title>
@@ -264,7 +299,7 @@ def project_blocks(recs, p):
     b["objective"] = f'Objective {o} · {OBJECTIVES[o]}'
     b["task"] = task(p["primary_task"])
     b["supporting"] = ", ".join(task(t) for t in p.get("supporting_tasks") or []) or '<span class="muted">none</span>'
-    b["status"] = chip(p["status"], "st-" + p["status"]) + (chip(p["phase"], "phase") if p.get("phase") else "")
+    b["status"] = chip(p["status"], "st-" + p["status"]) + phase_chip(p)
     b["lead_inst"] = unc(ref(recs, "institution", p["lead_institution"]["institution"]), p["lead_institution"]) + note(p["lead_institution"])
     b["institutions"] = "".join(f'<li>{unc(ref(recs, "institution", x["institution"]), x)} <span class="muted">{e(x.get("role") or "")}</span>{note(x)}</li>' for x in p.get("institutions") or [])
     b["leads"] = "".join(f"<li>{person(recs, x)}</li>" for x in p["leads"])
@@ -379,10 +414,10 @@ def project_C(recs, p, b):
 def directory_A(recs, P):
     """Sortable, filterable table."""
     rows = "".join(f"""<tr><td><a href="p-{e(p["id"])}.html">{e(p["id"])}</a></td><td><a href="p-{e(p["id"])}.html">{e(p["title"])}</a></td>
-<td>{task(p["primary_task"])}</td><td>{chip(p["status"], "st-" + p["status"])}</td><td>{e(p.get("phase") or "")}</td>
-<td>{", ".join(e(x["name"]) for x in p["leads"][:3])}{" +" + str(len(p["leads"]) - 3) if len(p["leads"]) > 3 else ""}</td>
+<td>{task(p["primary_task"])}</td><td>{chip(p["status"], "st-" + p["status"])}</td><td data-sort="{PHASES.index(p["phase"]) if p.get("phase") else 9}">{phase_chip(p)}</td>
+<td>{", ".join(person_link(x) for x in p["leads"][:3])}{" +" + str(len(p["leads"]) - 3) if len(p["leads"]) > 3 else ""}</td>
 <td>{ref(recs, "institution", p["lead_institution"]["institution"])}</td><td class="num">{count_unconfirmed(p) or ""}</td></tr>""" for p in P)
-    return f"""<h1>Research Projects</h1><p class="muted">{len(P)} registered · click a header to sort · retired IDs: {", ".join(RETIRED)}</p>
+    return f"""<h1>Research Projects</h1><p class="muted">{len(P)} registered · click a header to sort · retired IDs: {", ".join(RETIRED)}</p><p>{phase_legend()}</p>
 <input class="filter" placeholder="Filter by anything: name, Task, institution…" oninput="filterRows(this)">
 <table class="dir sortable"><thead><tr><th>ID</th><th>Title</th><th>Primary Task</th><th>Status</th><th>Phase</th><th>Leads</th><th>Lead institution</th><th title="unconfirmed facts">?</th></tr></thead>
 <tbody>{rows}</tbody></table>"""
@@ -390,7 +425,7 @@ def directory_A(recs, P):
 
 def directory_B(recs, P):
     """Outline grouped by Objective then Task."""
-    out = ["<h1>Perseus research, by Objective</h1>"]
+    out = [f"<h1>Perseus research, by Objective</h1><p>{phase_legend()}</p>"]
     for o, oname in OBJECTIVES.items():
         ps = [p for p in P if objective_of(p) == o]
         out.append(f'<section class="obj"><h2>Objective {o}: {oname} <span class="muted">({len(ps)})</span></h2>')
@@ -402,8 +437,8 @@ def directory_B(recs, P):
             for p in ps:
                 if p["primary_task"]["task"] == t:
                     flag = ' <span class="unc-flag" title="Task alignment unconfirmed">task unconfirmed</span>' if p["primary_task"].get("unconfirmed") else ""
-                    out.append(f'<li><a href="p-{e(p["id"])}.html"><b>{e(p["id"])}</b> {e(p["title"])}</a>{flag} {chip(p["status"], "st-" + p["status"])}'
-                               f'<p>{e(p["summary"])}</p><p class="muted">{", ".join(e(x["name"]) for x in p["leads"])}</p></li>')
+                    out.append(f'<li><a href="p-{e(p["id"])}.html"><b>{e(p["id"])}</b> {e(p["title"])}</a>{flag} {chip(p["status"], "st-" + p["status"])}{phase_chip(p)}'
+                               f'<p>{e(p["summary"])}</p><p class="muted">{", ".join(person_link(x) for x in p["leads"])}</p></li>')
             out.append("</ul>")
         out.append("</section>")
     return "".join(out)
@@ -411,11 +446,11 @@ def directory_B(recs, P):
 
 def directory_C(recs, P):
     """Connection matrix: Tasks and Objective integration at a glance."""
-    head = "".join(f"<th>{t}</th>" for t in TASKS) + "".join(f'<th>Obj {o}<br><small>{n}</small></th>' for o, n in OBJECTIVES.items())
+    head = "<th>Phase</th>" + "".join(f"<th>{t}</th>" for t in TASKS) + "".join(f'<th>Obj {o}<br><small>{n}</small></th>' for o, n in OBJECTIVES.items())
     rows = []
     for p in P:
         sup = {t["task"] for t in p.get("supporting_tasks") or []}
-        cells = "".join(f'<td class="m">{"●" if p["primary_task"]["task"] == t else ("○" if t in sup else "")}</td>' for t in TASKS)
+        cells = f'<td class="m">{phase_chip(p)}</td>' + "".join(f'<td class="m">{"●" if p["primary_task"]["task"] == t else ("○" if t in sup else "")}</td>' for t in TASKS)
         oi = p.get("objective_integration") or {}
         for o in OBJECTIVES:
             if o == objective_of(p):
@@ -478,6 +513,25 @@ def publication_page(recs, p):
     return simple(e(p["title"]), "", body, p["id"], "Publication")
 
 
+def people_page(recs):
+    """Contacts directory: everyone named on any record, with what they are on."""
+    rows = []
+    for key, p in sorted(PEOPLE.items(), key=lambda kv: kv[1]["name"].split()[-1].lower()):
+        insts = ", ".join(unc(ref(recs, "institution", i), i) for i in p["institutions"])
+        on = "".join(
+            f'<li>{pid(recs, rid) if t == "research-project" else ref(recs, t, rid)} '
+            f'<span class="role">{e(role)}</span>{" <span class=unc-flag>unconfirmed</span>" if x.get("unconfirmed") else ""}</li>'
+            for t, rid, role, x in p["on"])
+        orcid = f' <a class="orcid" href="https://orcid.org/{e(p["orcid"])}">iD</a>' if p["orcid"] else ' <span class="muted" title="Matched by name; add an ORCID to make this reliable">no ORCID</span>'
+        rows.append(f'<tr id="{e(key)}" class="person-row"><td><b>{e(p["name"])}</b>{orcid}</td><td>{insts}</td><td><ul>{on}</ul></td></tr>')
+    body = f"""<div class="simple wide"><h1>People</h1>
+<p class="muted">{len(PEOPLE)} people named on records. People are not records: they are matched across records by ORCID when present, otherwise by name.
+Use the filter to find someone; click any name on the site to land here.</p>
+<input class="filter" placeholder="Filter by name, institution, project…" oninput="filterRows(this)">
+<table class="dir people"><thead><tr><th>Name</th><th>Institution(s)</th><th>Research Projects and roles</th></tr></thead><tbody>{"".join(rows)}</tbody></table></div>"""
+    return [("A", "People directory (single layout)", body)]
+
+
 def mentions_page(recs, mentions):
     rows = "".join(f'<tr><td>{e(n)}</td><td>{e(k or "")}</td><td>{pid(recs, o)}</td></tr>' for o, k, n in sorted(mentions, key=lambda m: m[2]))
     return [("A", "Mentions (single layout)", f"""<div class="simple"><h1>Mentions</h1><p class="muted">Things referenced by name but not yet registered.
@@ -516,6 +570,7 @@ def main():
     recs = load_records()
     stac_meta(recs, offline)
     mentions = derive(recs)
+    index_people(recs)
     if OUT.exists():
         shutil.rmtree(OUT)
     OUT.mkdir()
@@ -540,6 +595,7 @@ def main():
     for x in recs["publication"].values():
         w(f"pub-{x['id']}.html", page(x["title"], publication_page(recs, x)))
     w("mentions.html", page("Mentions", mentions_page(recs, mentions), "mentions.html"))
+    w("people.html", page("People", people_page(recs), "people.html"))
     w("submit.html", submit_page(recs))
     print(f"built {len(list(OUT.glob('*.html')))} pages into {OUT.relative_to(REPO)}/")
     if "--serve" in sys.argv:
