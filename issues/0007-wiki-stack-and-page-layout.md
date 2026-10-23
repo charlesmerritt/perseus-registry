@@ -15,4 +15,4 @@ Constraint added after the relationship ticket: the stack must also host **schem
 
 ## Prototype
 
-Built as a prototype on branch `prototype/wiki-and-submission`, then promoted (user decision, 2026-10-23) to the canonical app in `site/`; see `site/README.md`. Run `uv run site/build.py --serve` and flip layouts with `?variant=A|B|C`. The site generator question is settled in practice: a small Python generator, not MkDocs. Layout and destination choices are still pending user review.
+Built as a prototype on branch `prototype/wiki-and-submission` (kept as the primary source, ending at `99564aa`), then promoted (user decision, 2026-10-23) to the canonical app in `site/`; see `site/README.md`. Run `uv run site/build.py --serve` and flip layouts with `?variant=A|B|C`. The site generator question is settled in practice: a small Python generator, not MkDocs. Layout and destination choices are still pending user review.
