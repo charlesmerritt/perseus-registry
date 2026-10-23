@@ -18,4 +18,4 @@ How does a contributor create or update a record without touching Git or YAML? D
 Keep the "static wiki, no computation" preference in mind: the published site stays static either way. Choose the flow for the consortium exercise.
 ## Prototype
 
-Throwaway prototype (shared by 0007 and 0008) on branch `prototype/wiki-and-submission`, in `site-prototype/`; see its README. Run `uv run site-prototype/build.py --serve` and flip layouts with `?variant=A|B|C`. Verdict pending user review.
+Built as a prototype on branch `prototype/wiki-and-submission`, then promoted (user decision, 2026-10-23) to the canonical app in `site/`; see `site/README.md`. Run `uv run site/build.py --serve` and flip layouts with `?variant=A|B|C`. The site generator question is settled in practice: a small Python generator, not MkDocs. Layout and destination choices are still pending user review.

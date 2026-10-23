@@ -1,4 +1,4 @@
-/* PROTOTYPE styles. Shared tokens and chrome, then one block per variant. */
+/* Site styles. Shared tokens and chrome, then one block per variant. */
 :root {
   --bg: #fbfaf7; --fg: #1d2421; --muted: #66706b; --line: #dcd9d0; --panel: #fff;
   --accent: #2f6b4f; --accent-soft: #e5f0ea; --warn: #9a6a00; --warn-soft: #fff4d6;

@@ -1,4 +1,4 @@
-// PROTOTYPE (issue 0008): schema-driven Research Project form.
+// Schema-driven Research Project form (issue 0008).
 // Fields come from the generated JSON Schema ($defs/ResearchProject); the only
 // hand-written parts are UI hints (section grouping, which registry list a
 // picker draws from, labels). Three layouts share one record in memory.

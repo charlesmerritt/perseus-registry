@@ -1,14 +1,15 @@
 # /// script
 # dependencies = ["pyyaml==6.0.2", "markdown==3.7"]
 # ///
-"""PROTOTYPE (issues 0007 + 0008): throwaway static wiki generator.
+"""Static wiki generator for the Perseus Research Registry.
 
-Three page layouts per page, switchable with ?variant=A|B|C and the floating
-bar; plus a schema-driven submission form (submit.html). Not production code.
+Builds the site from records/: directory, record pages, People, Mentions, and
+a schema-driven submission form (submit.html). Until layouts are chosen
+(issue 0007), each page carries three layouts switchable with ?variant=A|B|C.
 
-    uv run site-prototype/build.py           build into site-prototype/_site/
-    uv run site-prototype/build.py --serve   build, then serve on :8000
-    uv run site-prototype/build.py --offline use the STAC snapshot, no fetch
+    uv run site/build.py           build into site/_site/
+    uv run site/build.py --serve   build, then serve on :8000
+    uv run site/build.py --offline use the STAC snapshot, no fetch
 """
 import html, json, re, shutil, sys, urllib.request
 from pathlib import Path
@@ -282,10 +283,10 @@ def page(title, variants, active="", extra_head=""):
                   (("index.html", "Directory"), ("people.html", "People"), ("mentions.html", "Mentions"), ("submit.html", "Submit or update a record")))
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{e(title)} · Perseus Registry (prototype)</title>
+<title>{e(title)} · Perseus Research Registry</title>
 <link rel="stylesheet" href="style.css">{extra_head}</head>
 <body data-variants="{names}">
-<div class="proto-banner">PROTOTYPE · issues 0007/0008 · hand-written and rough records · not the real registry</div>
+<div class="proto-banner">DRAFT · layouts still being chosen (issue 0007): use ← → to compare · records are seeded, many facts unconfirmed</div>
 <header class="site"><a class="brand" href="index.html">Perseus Research Registry</a><nav>{nav}</nav></header>
 <main>{secs}</main>
 <script src="switcher.js"></script></body></html>"""

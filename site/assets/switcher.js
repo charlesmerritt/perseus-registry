@@ -1,4 +1,4 @@
-// PROTOTYPE variant switcher: ?variant=A|B|C, floating bar, ← → keys.
+// Layout switcher (until layouts are chosen, issue 0007): ?variant=A|B|C, floating bar, ← → keys.
 (function () {
   const secs = [...document.querySelectorAll("section.variant")];
   const keys = secs.map((s) => s.dataset.variant);
