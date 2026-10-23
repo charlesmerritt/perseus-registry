@@ -1,0 +1,6 @@
+id: maine-biomass-2023
+source:
+  stac:
+    collection: 22913402-bfc7-4951-9165-5e75fdd7f27f
+access: public
+availability: published

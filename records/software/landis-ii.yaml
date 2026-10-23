@@ -1,0 +1,19 @@
+id: landis-ii
+title: LANDIS-II
+summary: >-
+  Spatially explicit forest landscape model simulating succession,
+  disturbance and management. Perseus adapts it to Southern and Central
+  Hardwood forests (O2-06).
+kind: model
+maintainers:
+  - name: Bahaa Alaila
+    institution: uga
+    role: Consortium contact
+    unconfirmed: true
+    note: Upstream development is by the LANDIS-II Foundation.
+repository: https://github.com/LANDIS-II-Foundation
+url: https://www.landis-ii.org
+languages:
+  - C#
+development_status: active
+fdis_adapter: none

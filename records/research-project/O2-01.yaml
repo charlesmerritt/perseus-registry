@@ -1,0 +1,59 @@
+id: O2-01
+tracker_id: O2-01
+title: Harvest Choice Model and Landowner Decision Modeling
+summary: >-
+  Estimates landowner harvest and management choices under alternative
+  policy and market conditions with a multinomial-logit model of FIA,
+  ownership, stand, spatial and economic variables.
+status: active
+phase: integration
+primary_task:
+  task: "2.1"
+supporting_tasks:
+  - task: "2.2"
+  - task: "2.3"
+leads:
+  - name: Jianheng Zhao
+    institution: umaine
+  - name: Adam Daigneault
+    institution: umaine
+lead_institution:
+  institution: umaine
+institutions:
+  - institution: uga
+    role: modeling collaborator
+  - institution: purdue
+    role: modeling collaborator
+inputs:
+  - dataset: fia
+    via:
+      name: Harvest Choice Model
+  - dataset:
+      name: Ownership, stand, spatial and economic variables
+    via:
+      name: Harvest Choice Model
+  - dataset:
+      name: Objective 3 landowner typologies and management-intentions survey data
+outputs:
+  - dataset:
+      name: Harvest Choice Model projections
+    via:
+      name: Harvest Choice Model
+    note: Used by O2-07 and O2-15.
+depends_on:
+  - project: O2-04
+    note: Scenario assumptions.
+related_to:
+  - project: O2-02
+    unconfirmed: true
+    note: >-
+      Possible comparison of results. Confirm whether O2-02 is a separate
+      implementation or the integration layer for this model.
+objective_integration:
+  "1":
+    level: informational
+  "3":
+    level: integrated
+    note: Landowner typologies and management-intentions data are direct inputs.
+  "4":
+    level: n/a

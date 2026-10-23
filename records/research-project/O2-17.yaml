@@ -1,0 +1,62 @@
+id: O2-17
+tracker_id: O2-17
+title: Canopy Height / Biomass Scaling for Decision Support
+summary: >-
+  Uses GEDI/ICESat-2 labels and multitemporal Sentinel/Landsat inputs to
+  generate scalable canopy-height and potentially biomass products for model
+  inputs and decision support.
+status: active
+phase: development
+primary_task:
+  task: "1.3"
+  unconfirmed: true
+  note: >-
+    Tracker says "Not assigned - actually Objective 1 Task 1.3?". The ID
+    keeps its O2 prefix.
+supporting_tasks:
+  - task: "2.1"
+    unconfirmed: true
+  - task: "2.2"
+    unconfirmed: true
+  - task: "2.4"
+    unconfirmed: true
+leads:
+  - name: Jinha Jung
+    institution: purdue
+    unconfirmed: true
+    note: Affiliation not stated in the tracker.
+lead_institution:
+  institution: purdue
+  unconfirmed: true
+collaborators:
+  - name: Arnav Goel
+    institution: purdue
+    unconfirmed: true
+    note: Affiliation not stated in the tracker.
+  - name: Xinyuan Wei
+    institution: purdue
+    unconfirmed: true
+    note: Affiliation not stated in the tracker.
+inputs:
+  - dataset:
+      name: GEDI and ICESat-2 canopy-height labels
+  - dataset:
+      name: Multitemporal Sentinel and Landsat imagery
+outputs:
+  - dataset:
+      name: Canopy-height and biomass products
+    note: Not in D2S STAC yet. Used by O2-16 and downstream model and visualization workflows.
+related_to:
+  - project: O2-16
+    unconfirmed: true
+    note: >-
+      Proposed: merge the Objective 2 component into O2-16 and track the
+      underlying canopy-height research under Objective 1.
+objective_integration:
+  "2":
+    level: integrated
+    note: Objective 2 relevance is as a data input and dependency.
+  "3":
+    level: n/a
+  "4":
+    level: n/a

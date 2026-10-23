@@ -1,0 +1,6 @@
+id: howland-biomass
+source:
+  stac:
+    collection: bfff8c87-1974-4442-9963-d09f35cbd79e
+access: public
+availability: published

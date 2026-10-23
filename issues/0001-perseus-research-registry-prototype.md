@@ -27,6 +27,7 @@ A demonstrable prototype of the Perseus research registry: a **static wiki** gen
 - [How are relationships between records represented, and which record owns each link?](0005-relationship-model.md): links embedded on one owning record, inverses generated; inputs/outputs on the Research Project (optional `via` Software); dependencies generated from matching datasets plus declared ones; Datasets may point at STAC or an external source; Mentions for unregistered things; Integration Level is a per-Objective map.
 - [What are the fields, identifiers, and controlled vocabularies for each record type?](0006-record-schemas-and-ids.md): project IDs `O2-06` style (never change), slugs for other types; LinkML source with committed JSON Schema + JSON-LD; status vs phase; people inline with ORCID; `unconfirmed` marker allows placeholders.
 - [Write the FDIS Registry Profile v0.1 schema in LinkML](0009-write-registry-profile-schema.md): done; `schema/` + `examples/` + `scripts/check.sh` pass. Uniform link objects (any target may be a Mention); some rules left to the form/build; JSON-LD base URL is a placeholder.
+- [Seed the Objective 2 records from the tracker](0010-seed-objective-2-records.md): done; 27 records in `records/` (14 projects, 3 institutions, 8 datasets, 2 software), all validated; prose in sibling `.md`; most affiliations and lead institutions are unconfirmed guesses awaiting review.
 - Canonical terms: **Research Project** (not "project"/"workstream"), **Software** with `kind: model | tool | library` (see `CONTEXT.md`).
 
 ## Not yet specified

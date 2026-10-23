@@ -29,7 +29,7 @@ Needs only [uv](https://docs.astral.sh/uv/). The LinkML version is pinned in `sc
 scripts/check.sh
 ```
 
-This fails if `generated/` differs from what the schema produces, then validates every file under `examples/`.
+This fails if `generated/` differs from what the schema produces, then validates every file under `examples/` and `records/`.
 
 A record file holds one record, and its type comes from its directory: `research-project/`, `software/`, `dataset/`, `institution/` or `publication/`. The validator checks each file against that class's definition (`$defs/<Class>`) in the single generated JSON Schema. It also checks that the record's `id` matches the file name. To validate other records:
 

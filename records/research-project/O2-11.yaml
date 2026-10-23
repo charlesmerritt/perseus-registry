@@ -1,0 +1,53 @@
+id: O2-11
+tracker_id: O2-11
+title: Forest Products Transportation Cost and Supply-Chain Optimization
+summary: >-
+  Evaluates the movement of wood from forests to mills by combining forest
+  inventory, mill demand, transportation networks and operational,
+  regulatory, capacity, safety and sustainability constraints.
+status: active
+phase: development
+primary_task:
+  task: "2.3"
+  unconfirmed: true
+  note: Tracker asks whether this is the principal operational project under 2.3.
+supporting_tasks:
+  - task: "2.2"
+leads:
+  - name: Joe Conrad
+    institution: uga
+    unconfirmed: true
+    note: Affiliation not stated in the tracker.
+  - name: Chad Bolding
+    institution: uga
+    unconfirmed: true
+    note: Affiliation not stated in the tracker.
+  - name: Bandana Subedi
+    institution: uga
+    role: PhD student
+    unconfirmed: true
+    note: Affiliation not stated in the tracker.
+lead_institution:
+  institution: uga
+  unconfirmed: true
+  note: Tracker names UGA value-chain and timber-supply teams as collaborators.
+inputs:
+  - dataset:
+      name: Forest inventory, mill demand, transportation-network and policy inputs
+outputs:
+  - dataset:
+      name: Transportation and value-chain cost estimates
+    note: For O2-15 and potentially O2-08.
+depends_on:
+  - project: O2-04
+    note: Market and policy scenario assumptions.
+  - project: O2-08
+    note: Timber-supply projections.
+objective_integration:
+  "1":
+    level: informational
+  "3":
+    level: collaborative
+    note: Market and policy scenarios where applicable.
+  "4":
+    level: n/a

@@ -1,0 +1,81 @@
+id: O2-15
+tracker_id: O2-15
+title: Multimodel and Scenario Visualization
+summary: >-
+  A stand-alone project that builds static and interactive tools for
+  comparing outputs across models and scenarios: inventory, harvest,
+  carbon, habitat, water, climate, market and policy results.
+status: active
+phase: development
+primary_task:
+  task: "2.4"
+supporting_tasks:
+  - task: "2.1"
+  - task: "2.2"
+  - task: "2.3"
+leads:
+  - name: Jinha Jung
+    institution: purdue
+    unconfirmed: true
+    note: Affiliation not stated in the tracker.
+  - name: Bruno da Silva
+    institution: uga
+  - name: Fred Maier
+    institution: uga
+  - name: Ken Bundy
+    institution: umaine
+    unconfirmed: true
+    note: Affiliation not stated in the tracker.
+  - name: Erin Simons-Legaard
+    institution: umaine
+  - name: Chaz Merritt
+    institution: uga
+  - name: Bahaa Alaila
+    institution: uga
+lead_institution:
+  institution: purdue
+  unconfirmed: true
+  note: Leads span Purdue, UGA and Maine; the tracker names no lead institution.
+collaborators:
+  - name: Nicole Kong
+    institution: purdue
+    unconfirmed: true
+    note: Affiliation not stated in the tracker.
+  - name: Victor Chen
+    institution:
+      name: Not stated
+      unconfirmed: true
+    unconfirmed: true
+    note: Affiliation not stated in the tracker.
+institutions:
+  - institution: uga
+    role: collaborator
+    note: UGA interns are also listed as leads.
+  - institution: umaine
+    role: collaborator
+outputs:
+  - dataset:
+      name: Integrated decision-support views
+    note: For Objective 3 and broader Perseus users.
+depends_on:
+  - project: O2-01
+  - project: O2-02
+    unconfirmed: true
+    note: Potential management optimization outputs.
+  - project: O2-05
+  - project: O2-06
+  - project: O2-07
+  - project: O2-08
+  - project: O2-10
+  - project: O2-11
+  - project: O2-12
+  - project: O2-16
+    note: Platform and data infrastructure.
+objective_integration:
+  "1":
+    level: collaborative
+  "3":
+    level: integrated
+    note: Stakeholder preferences and decision-support needs.
+  "4":
+    level: discuss

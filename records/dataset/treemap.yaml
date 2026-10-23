@@ -1,0 +1,8 @@
+# A STAC-sourced Dataset: title and summary come from the D2S STAC
+# Collection at build time, so they are omitted here.
+id: treemap
+source:
+  stac:
+    collection: f8934dd1-75c0-4fa0-9c75-b29c8e4c7dc1
+access: public
+availability: published

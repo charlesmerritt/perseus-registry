@@ -1,0 +1,6 @@
+id: 3dep
+source:
+  stac:
+    collection: 3dep
+access: public
+availability: published

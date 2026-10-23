@@ -1,0 +1,18 @@
+id: d2s
+title: Data to Science (D2S)
+summary: >-
+  Open platform for uploading, processing, publishing and sharing UAS and
+  other geospatial data. Publishes its public projects to the D2S STAC
+  catalog (stac.d2s.org), which the registry links Datasets to.
+kind: tool
+maintainers:
+  - name: Jinha Jung
+    institution: purdue
+    role: Consortium contact
+    unconfirmed: true
+    note: Developed by the Geospatial Data Science Lab (gdslab) at Purdue.
+repository: https://github.com/gdslab/data-to-science
+url: https://d2s.org
+license: MIT
+development_status: active
+fdis_adapter: none

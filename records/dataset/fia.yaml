@@ -1,0 +1,12 @@
+# FIA plot data has no D2S STAC collection (the STAC survey found only
+# FIA-derived products: TreeMap and BigMap), so it points at the external
+# FIA DataMart.
+id: fia
+title: Forest Inventory and Analysis (FIA) plot data
+summary: >-
+  USDA Forest Service national forest inventory: repeated-measure plot,
+  tree and condition data, downloaded through the FIA DataMart.
+source:
+  url: https://apps.fs.usda.gov/fia/datamart/
+access: public
+availability: published

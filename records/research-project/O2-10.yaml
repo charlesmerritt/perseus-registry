@@ -1,0 +1,68 @@
+id: O2-10
+tracker_id: O2-10
+title: Forest Health Assessment from Ground and Aerial Data
+summary: >-
+  Links foliar traits, hyperspectral measurements, chemistry, herbivory,
+  stand condition and UAS/aircraft imagery to disease classification and
+  forest-health assessment from local to regional scales.
+status: active
+phase: development
+primary_task:
+  task: "2.1"
+  unconfirmed: true
+  note: >-
+    Placed under 2.1 because that is the annual-report alignment. Confirm,
+    and whether the regional scaling component belongs under 2.2.
+supporting_tasks:
+  - task: "2.2"
+  - task: "2.4"
+leads:
+  - name: Melba Crawford
+    institution: purdue
+    unconfirmed: true
+    note: Affiliation not stated in the tracker.
+  - name: John Couture
+    institution: purdue
+    unconfirmed: true
+    note: Affiliation not stated in the tracker.
+  - name: Ned Rubert-Nason
+    institution: umaine
+    unconfirmed: true
+    note: Affiliation not stated in the tracker.
+lead_institution:
+  institution: purdue
+  unconfirmed: true
+  note: Tracker names Purdue and Maine forest-health teams.
+collaborators:
+  - name: Shahla Mohammadi
+    institution: purdue
+    unconfirmed: true
+    note: Affiliation not stated in the tracker.
+institutions:
+  - institution: umaine
+    role: forest-health team
+inputs:
+  - dataset:
+      name: Foliar trait, hyperspectral, chemistry and herbivory field data (Indiana, Maine)
+  - dataset:
+      name: UAS and aircraft imagery for forest health
+  - dataset:
+      name: Objective 3 pest and disturbance scenarios
+outputs:
+  - dataset:
+      name: Forest-health and risk information
+    note: For regional models and O2-15; exact downstream users to confirm.
+depends_on:
+  - project: O2-04
+    note: Pest and disturbance scenario assumptions.
+  - project: O2-16
+    note: Remote-sensing data products.
+objective_integration:
+  "1":
+    level: integrated
+    note: Remote-sensing methods and data products.
+  "3":
+    level: collaborative
+    note: Pest and disturbance scenarios.
+  "4":
+    level: n/a

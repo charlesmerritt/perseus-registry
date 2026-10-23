@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Regenerate the JSON Schema and JSON-LD context from the LinkML schema, fail
-# if they differ from the committed copies, then validate every example record.
+# if they differ from the committed copies, then validate every example and
+# seeded record.
 #
 #   scripts/check.sh            check (CI)
 #   scripts/check.sh --write    regenerate and overwrite schema/generated/
@@ -38,4 +39,4 @@ else
 fi
 
 uv run --quiet --no-project --with jsonschema==4.23.0 --with pyyaml==6.0.2 \
-  python scripts/validate_records.py "$OUT/$JSON" examples
+  python scripts/validate_records.py "$OUT/$JSON" examples records

@@ -1,0 +1,6 @@
+id: indiana-lidar-point-cloud
+source:
+  stac:
+    collection: indiana-lidar-point-cloud
+access: public
+availability: published

@@ -1,0 +1,48 @@
+id: O2-08
+tracker_id: O2-08
+title: UGA Timber Supply Model and Results Website
+summary: >-
+  Refines a UGA timber-supply model that forecasts prices, supply and
+  forest structure, and presents major results through a website.
+status: active
+phase: development
+primary_task:
+  task: "2.2"
+supporting_tasks:
+  - task: "2.3"
+  - task: "2.4"
+leads:
+  - name: Bruno da Silva
+    institution: uga
+  - name: Chaz Merritt
+    institution: uga
+lead_institution:
+  institution: uga
+collaborators:
+  - name: Fred Maier
+    institution: uga
+inputs:
+  - dataset:
+      name: Timber supply and demand assumptions
+    via:
+      name: UGA Timber Supply Model
+outputs:
+  - dataset:
+      name: Timber supply, price and forest-structure projections
+    via:
+      name: UGA Timber Supply Model
+    note: Used by O2-11 and O2-15.
+depends_on:
+  - project: O2-04
+    note: Market and policy scenarios.
+  - project: O2-11
+    unconfirmed: true
+    note: Transportation and value-chain outputs, potentially.
+objective_integration:
+  "1":
+    level: informational
+  "3":
+    level: collaborative
+    note: Market and policy scenarios.
+  "4":
+    level: n/a

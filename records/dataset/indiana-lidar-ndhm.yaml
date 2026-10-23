@@ -1,0 +1,6 @@
+id: indiana-lidar-ndhm
+source:
+  stac:
+    collection: indiana-lidar-ndhm
+access: public
+availability: published
