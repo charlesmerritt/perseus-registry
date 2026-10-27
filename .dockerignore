@@ -1,0 +1,5 @@
+.git
+.claude
+**/__pycache__
+.pytest_cache
+site/_site

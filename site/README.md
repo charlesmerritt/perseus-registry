@@ -31,9 +31,20 @@ uv run site/build.py --offline    # skip the STAC fetch, use stac-snapshot.json
 
 Contributors need a free GitHub account, but no Git or YAML. Before the first real submission:
 
-- Set `GH` in `assets/form.js` to the registry repository's URL. It is a placeholder because the repo has no remote yet.
+- The form points to `https://github.com/charlesmerritt/perseus-registry`. Contributors need access to this private repository to submit changes.
 - Create the `submission` and `approved` labels.
 - Under Settings → Actions → General, allow GitHub Actions to create pull requests.
+
+## Railway deployment
+
+The root `Dockerfile` builds the pages with Python and serves only the generated
+site with Caddy. Caddy listens on Railway's `PORT`, defaulting to 8080 locally.
+`railway.json` configures a health check of the directory page.
+
+Connect the GitHub repository's `main` branch to a Railway service with the
+repository root as its build directory, then generate a public domain. Pushes
+to `main`, including merged record changes, rebuild and deploy the site. STAC
+metadata is refreshed during the build, with the committed snapshot as fallback.
 
 ## How it works
 

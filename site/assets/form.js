@@ -6,7 +6,7 @@
 (function () {
   const SCHEMA = window.SCHEMA, REG = window.REGISTRY, defs = SCHEMA.$defs;
   const CLASS = "ResearchProject";
-  const GH = "https://github.com/OWNER/perseus-registry"; // placeholder: repo has no remote yet
+  const GH = "https://github.com/charlesmerritt/perseus-registry";
   const MAX_URL = 8000; // GitHub rejects longer prefilled URLs
 
   // ---- UI hints (the non-schema part) ----
